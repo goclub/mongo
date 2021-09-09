@@ -45,7 +45,7 @@ func (suite TestExampleSuite) TestCollection_InsertOne() {
 	ExampleCollection_InsertOne()
 }
 func ExampleCollection_InsertOne() {
-	/* ignore this line */var err error;defer func() { if err != nil { xerr.PrintStack(err) } }()
+	/* In a formal environment ignore defer code */var err error;defer func() { if err != nil { xerr.PrintStack(err) } }()
 	ctx := context.Background()
 	comment := mo.EComment{
 		UserID: 1,
@@ -62,7 +62,7 @@ func (suite TestExampleSuite) TestCollection_InsertMany() {
 	ExampleCollection_InsertMany()
 }
 func ExampleCollection_InsertMany() {
-	/* ignore this line */var err error;defer func() { if err != nil { xerr.PrintStack(err) } }()
+	/* In a formal environment ignore defer code */var err error;defer func() { if err != nil { xerr.PrintStack(err) } }()
 	ctx := context.Background()
 	commentList := mo.ManyEComment{
 		{UserID: 1, Message: "a"},

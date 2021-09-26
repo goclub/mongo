@@ -3,6 +3,7 @@ package mo
 import (
 	"context"
 	xerr "github.com/goclub/error"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -10,13 +11,13 @@ import (
 
 type Collection struct {
 	db *Database
-	core *mongo.Collection
+	Core *mongo.Collection
 	name string 
 }
 func NewCollection(db *Database, collectionName string, opts ...*options.CollectionOptions) *Collection {
 	return &Collection{
 		db: db,
-		core: db.core.Collection(collectionName, opts...),
+		Core: db.core.Collection(collectionName, opts...),
 		name:   collectionName,
 	}
 }
@@ -26,9 +27,9 @@ type ResultInsertOne struct {
 func (res ResultInsertOne) InsertedObjectID() primitive.ObjectID {
 	return res.InsertedID.(primitive.ObjectID)
 }
-func (c Collection) InsertOne(ctx context.Context, document Document, opts ...*options.InsertOneOptions) (result ResultInsertOne, err error) {
+func (c Collection) InsertOne(ctx context.Context, document Document, cmd InsertOneCommand) (result ResultInsertOne, err error) {
 	defer func() { if err != nil { err = xerr.WithStack(err) } }()
-	coreRes, err := c.core.InsertOne(ctx, document.D(), opts...) ; if err != nil {
+	coreRes, err := c.Core.InsertOne(ctx, document, cmd.Options()...) ; if err != nil {
 	    return
 	}
 	result.InsertOneResult = coreRes
@@ -48,9 +49,12 @@ func (res ResultInsertMany) InsertedObjectIDs() (insertedObjectIDs []primitive.O
 	}
 	return
 }
-func (c Collection) InsertMany(ctx context.Context, documents DocumentMany, opts ...*options.InsertManyOptions) (result ResultInsertMany, err error) {
+func (c Collection) InsertMany(ctx context.Context, documents DocumentMany, cmd InsertManyCommand) (result ResultInsertMany, err error) {
 	defer func() { if err != nil { err = xerr.WithStack(err) } }()
-	coreRes, err := c.core.InsertMany(ctx, documents.DS(), opts...) ; if err != nil {
+	data, err := documents.ManyD() ; if err != nil {
+	    return
+	}
+	coreRes, err := c.Core.InsertMany(ctx, data, cmd.Options()...) ; if err != nil {
 		return
 	}
 	result.InsertManyResult = coreRes
@@ -58,6 +62,44 @@ func (c Collection) InsertMany(ctx context.Context, documents DocumentMany, opts
 		ObjectIDs: result.InsertedObjectIDs,
 	}) ; if err != nil {
 	    return
+	}
+	return
+}
+
+func (c Collection) FindByObjectID(ctx context.Context, objectID primitive.ObjectID, document Document, cmd FindOneCommand) (has bool, err error) {
+	defer func() { if err != nil { err = xerr.WithStack(err) } }()
+	res := c.Core.FindOne(ctx, bson.D{{"_id", objectID}}, cmd.Options()...)
+	err = res.Err()
+	has = true
+	if xerr.Is(err, mongo.ErrNoDocuments) {
+		has = false
+		err = nil
+		return
+	}
+	if err != nil {
+		return
+	}
+	err = res.Decode(document) ; if err != nil {
+	    return
+	}
+	return
+}
+
+func (c Collection) FindOne(ctx context.Context, filter interface{}, document Document, cmd FindOneCommand) (has bool, err error) {
+	defer func() { if err != nil { err = xerr.WithStack(err) } }()
+	res := c.Core.FindOne(ctx, filter, cmd.Options()...)
+	err = res.Err()
+	has = true
+	if xerr.Is(err, mongo.ErrNoDocuments) {
+		has = false
+		err = nil
+		return
+	}
+	if err != nil {
+		return
+	}
+	err = res.Decode(document) ; if err != nil {
+		return
 	}
 	return
 }

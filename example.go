@@ -5,33 +5,31 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type EComment struct {
-	ObjectID primitive.ObjectID
-	UserID uint64
-	Message string
+type Comment struct {
+	ObjectID primitive.ObjectID `bson:"_id,omitempty"`
+	UserID uint64 `bson:"userID"`
+	Message string `bson:"message"`
+	Like uint64 `bson:"like"`
 }
 
 
-func (v *EComment) BeforeInsert(data BeforeInsertData) (err error) {
+func (v *Comment) BeforeInsert(data BeforeInsertData) (err error) {
 	if v.ObjectID.IsZero() { v.ObjectID = data.ObjectID }
 	return
 }
-func (v EComment) D() bson.D {
-	return bson.D{
-		{"userID", v.UserID},
-		{"message", v.Message,},
-	}
-}
-
-type ManyEComment []EComment
-func (many ManyEComment) DS () (ds []interface{}) {
+type ManyComment []Comment
+func (many ManyComment) ManyD () (documents []interface{}, err error) {
 	for _, v := range many {
-		ds = append(ds, v.D())
+		var b []byte
+		b, err = bson.Marshal(v) ; if err != nil {
+		    return
+		}
+		documents = append(documents, bson.Raw(b))
 	}
 	return
 }
 
-func (many ManyEComment) BeforeInsertMany(data BeforeInsertManyData) (err error) {
+func (many ManyComment) BeforeInsertMany(data BeforeInsertManyData) (err error) {
 	objectIDs := data.ObjectIDs()
 	for i,_ := range many {
 		many[i].ObjectID = objectIDs[i]

@@ -47,15 +47,15 @@ func (suite TestExampleSuite) TestCollection_InsertOne() {
 func ExampleCollection_InsertOne() {
 	/* In a formal environment ignore defer code */var err error;defer func() { if err != nil { xerr.PrintStack(err) } }()
 	ctx := context.Background()
-	comment := mo.EComment{
+	comment := mo.Comment{
 		UserID: 1,
 		Message: "goclub/mongo",
 	}
-	_, err = commentColl.InsertOne(ctx, &comment) ; if err != nil {
+	_, err = commentColl.InsertOne(ctx, &comment, mo.InsertOneCommand{}) ; if err != nil {
 		return
 	}
 	log.Printf("ExampleCollection_InsertOne: %+v", comment)
-	// ExampleCollection_InsertOne: {ObjectID:ObjectID("613a2571f3526f555cdd39a0") UserID:1 Message:goclub/mongo}
+	// ExampleCollection_InsertOne: {ObjectID:ObjectID("613a2571f3526f555cdd39a0") UserID:1 Message:goclub/mongo Like:0}
 }
 
 func (suite TestExampleSuite) TestCollection_InsertMany() {
@@ -64,13 +64,36 @@ func (suite TestExampleSuite) TestCollection_InsertMany() {
 func ExampleCollection_InsertMany() {
 	/* In a formal environment ignore defer code */var err error;defer func() { if err != nil { xerr.PrintStack(err) } }()
 	ctx := context.Background()
-	commentList := mo.ManyEComment{
+	commentList := mo.ManyComment{
 		{UserID: 1, Message: "a"},
 		{UserID: 1, Message: "b"},
 	}
-	_, err = commentColl.InsertMany(ctx, &commentList) ; if err != nil {
+	_, err = commentColl.InsertMany(ctx, &commentList, mo.InsertManyCommand{}) ; if err != nil {
 		return
 	}
 	log.Printf("ExampleCollection_InsertMany: %+v", commentList)
-	// ExampleCollection_InsertMany: [{ObjectID:ObjectID("613a2571f3526f555cdd399e") UserID:1 Message:a} {ObjectID:ObjectID("613a2571f3526f555cdd399f") UserID:1 Message:b}]
+	// ExampleCollection_InsertMany: [{ObjectID:ObjectID("613a2571f3526f555cdd399e") UserID:1 Message:a Like:0} {ObjectID:ObjectID("613a2571f3526f555cdd399f") UserID:1 Message:b Like:0}]
+}
+
+func (suite TestExampleSuite) TestCollection_Find() {
+	ExampleCollection_Find()
+}
+func ExampleCollection_Find() {
+	/* In a formal environment ignore defer code */var err error;defer func() { if err != nil { xerr.PrintStack(err) } }()
+	ctx := context.Background()
+	comment := mo.Comment{
+		UserID:   1,
+		Message:  "test find",
+	}
+	_, err = commentColl.InsertOne(ctx, &comment, mo.InsertOneCommand{}) ; if err != nil {
+	    return
+	}
+	findComment := mo.Comment{}
+	// comment.ObjectID = primitive.NewObjectID() // if uncomment this line of code, hasComment will be false
+	hasComment, err := commentColl.FindByObjectID(ctx, comment.ObjectID, &findComment, mo.FindOneCommand{}) ; if err != nil {
+	    return
+	}
+	log.Print("ExampleCollection_Find: ", findComment, hasComment)
+	// ExampleCollection_Find: {ObjectID("613b1bbbb073a4ffefb02228") 1 test find 0} true
+
 }

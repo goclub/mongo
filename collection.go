@@ -76,6 +76,11 @@ func (c Collection) FindByObjectID(ctx context.Context, objectID primitive.Objec
 		err = nil
 		return
 	}
+	if xerr.Is(err, mongo.ErrNilDocument) {
+		has = false
+		err = nil
+		return
+	}
 	if err != nil {
 		return
 	}
@@ -91,6 +96,11 @@ func (c Collection) FindOne(ctx context.Context, filter interface{}, document Do
 	err = res.Err()
 	has = true
 	if xerr.Is(err, mongo.ErrNoDocuments) {
+		has = false
+		err = nil
+		return
+	}
+	if xerr.Is(err, mongo.ErrNilDocument) {
 		has = false
 		err = nil
 		return

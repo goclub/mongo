@@ -32,7 +32,7 @@ type FindOneCommand struct {
 	Skip xtype.OptionInt64
 	AllowPartialResults xtype.OptionBool
 	Collation *options.Collation
-	Comment *xtype.OptionString
+	Comment xtype.OptionString
 	Hint interface{}
 	Max interface{}
 	MaxTime xtype.OptionDuration
@@ -54,9 +54,6 @@ func (c FindOneCommand) Options ()(opt []*options.FindOneOptions) {
 	}
 	if c.Collation != nil {
 		opt = append(opt, options.FindOne().SetCollation(c.Collation))
-	}
-	if c.Comment.Valid() {
-		opt = append(opt, options.FindOne().SetComment(c.Comment.Unwrap()))
 	}
 	if c.Comment.Valid() {
 		opt = append(opt, options.FindOne().SetComment(c.Comment.Unwrap()))

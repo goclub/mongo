@@ -12,6 +12,7 @@ import (
 	mongoOptions "go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"log"
+	"sync"
 	"testing"
 )
 
@@ -99,46 +100,36 @@ func ExampleCollection_InsertIgnore() {
 	newsID := primitive.NewObjectID()
 	stat := mo.NewsStatDaily{Date: "1949-10-01", NewsID: newsID}
 	field := stat.Field()
+	wg := sync.WaitGroup{}
+	// Simulation of concurrent
 	for i:=0;i<2;i++ {
-		result, err := newsStatDaily.UpdateOne(ctx, bson.D{
-			{field.Date, "2008-08-08"},
-			{field.NewsID, newsID},
-		}, bson.D{
-			{
-				"$set", bson.D{
-				{field.UV, 0},
-				{field.PV, 0},
-			},
-			},
-		}, mo.UpdateCommand{
-			// If true, a new document will be inserted if the filter does not match any documents in the collection. The
-			// default value is false.
-			Upsert: xtype.Bool(true),
-		}) ; if err != nil {
-			return
-		}
-		log.Printf("$set UpdateResult%+v", *result)
-	}
-	for i:=0;i<2;i++ {
-		result, err := newsStatDaily.UpdateOne(ctx, bson.D{
-			{field.Date, "2008-08-08"},
-			{field.NewsID, newsID},
-		}, bson.D{
-			{
-				"$inc", bson.D{
-				{field.UV, 1},
-				{field.PV, 1},
-			},
-			},
-		}, mo.UpdateCommand{
-			// If true, a new document will be inserted if the filter does not match any documents in the collection. The
-			// default value is false.
-			Upsert: xtype.Bool(true),
-		}) ; if err != nil {
-			return
-		}
+		wg.Add(1)
+		go func() {
+			/* In a formal environment ignore defer code */var err error;defer func() { if err != nil { xerr.PrintStack(err) } }()
+			result, err := newsStatDaily.UpdateOne(ctx, bson.D{
+				{field.Date, "2008-08-08"},
+				{field.NewsID, newsID},
+			}, bson.D{
+				{
+					// You can also change it to $set
+					// Upsert is the key
+					"$inc", bson.D{
+					{field.UV, 1},
+					{field.PV, 1},
+				},
+				},
+			}, mo.UpdateCommand{
+				// If true, a new document will be inserted if the filter does not match any documents in the collection. The
+				// default value is false.
+				Upsert: xtype.Bool(true),
+			}) ; if err != nil {
+				return
+			}
 			log.Printf("$inc UpdateResult%+v", *result)
+			wg.Done()
+		}()
 	}
+	wg.Wait()
 }
 
 func (suite TestExampleSuite) TestCollection_Find() {

@@ -59,7 +59,9 @@ type NewsStatDaily struct {
 	NewsID primitive.ObjectID `bson:"newsID"`
 	UV uint64 `bson:"uv"`
 	PV uint64 `bson:"pv"`
+	PlatformUV map[string]uint64 `bson:"platformUV"`
 }
+
 func (v *NewsStatDaily) BeforeInsert(data BeforeInsertData) (err error) {
 	if v.ID.IsZero() { v.ID = data.ObjectID }
 	return
@@ -71,12 +73,14 @@ func (d NewsStatDaily) Field() (f struct {
 	NewsID string
 	UV    string
 	PV string
+	PlatformUV string
 } ) {
 	f.ID = "_id"
 	f.Date = "date"
 	f.NewsID = "newsID"
 	f.UV = "uv"
 	f.PV = "pv"
+	f.PlatformUV = "platformUV"
 	return
 }
 

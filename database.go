@@ -7,13 +7,13 @@ import (
 
 type Database struct {
 	client *mongo.Client
-	core *mongo.Database
+	Core *mongo.Database
 	name string
 }
 func NewDatabase(client *mongo.Client, dbName string, opts ...*options.DatabaseOptions) *Database {
 	return &Database{
 		client: client,
-		core: client.Database(dbName, opts...),
+		Core: client.Database(dbName, opts...),
 		name: dbName,
 	}
 }

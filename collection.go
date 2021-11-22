@@ -17,7 +17,7 @@ type Collection struct {
 func NewCollection(db *Database, collectionName string, opts ...*options.CollectionOptions) *Collection {
 	return &Collection{
 		db: db,
-		Core: db.core.Collection(collectionName, opts...),
+		Core: db.Core.Collection(collectionName, opts...),
 		name:   collectionName,
 	}
 }

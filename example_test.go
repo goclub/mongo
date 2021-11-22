@@ -2,6 +2,7 @@ package mo_test
 
 import (
 	"context"
+	"encoding/json"
 	xerr "github.com/goclub/error"
 	mo "github.com/goclub/mongo"
 	xtype "github.com/goclub/type"
@@ -26,7 +27,7 @@ type TestExampleSuite struct {
 
 var db *mo.Database
 var commentColl *mo.Collection
-var newsStatDaily *mo.Collection
+var newsStatDailyCool *mo.Collection
 
 func init () {
 	ExampleNewDatabase()
@@ -45,11 +46,11 @@ func ExampleNewDatabase() {
 func ExampleNewCollection() {
 	/* In a formal environment ignore defer code */var err error;defer func() { if err != nil { xerr.PrintStack(err) } }()
 	commentColl = mo.NewCollection(db, "comment")
-	newsStatDaily = mo.NewCollection(db, "newsStatDaily")
+	newsStatDailyCool = mo.NewCollection(db, "newsStatDaily")
 	// create indexes
 	{
 		f := mo.NewsStatDaily{}.Field()
-		_, err = newsStatDaily.Core.Indexes().CreateOne(context.TODO(), mongo.IndexModel{
+		_, err = newsStatDailyCool.Core.Indexes().CreateOne(context.TODO(), mongo.IndexModel{
 			Keys: bson.D{{f.Date, 1}, {f.NewsID, 1}},
 			Options: mongoOptions.Index().SetUnique(true),
 		}) ; if err != nil {
@@ -96,7 +97,6 @@ func (suite TestExampleSuite) TestCollection_InsertIgnore() {
 func ExampleCollection_InsertIgnore() {
 	/* In a formal environment ignore defer code */var err error;defer func() { if err != nil { xerr.PrintStack(err) } }()
 	ctx := context.Background()
-	_=ctx
 	newsID := primitive.NewObjectID()
 	stat := mo.NewsStatDaily{Date: "1949-10-01", NewsID: newsID}
 	field := stat.Field()
@@ -106,7 +106,7 @@ func ExampleCollection_InsertIgnore() {
 		wg.Add(1)
 		go func() {
 			/* In a formal environment ignore defer code */var err error;defer func() { if err != nil { xerr.PrintStack(err) } }()
-			result, err := newsStatDaily.UpdateOne(ctx, bson.D{
+			result, err := newsStatDailyCool.UpdateOne(ctx, bson.D{
 				{field.Date, "2008-08-08"},
 				{field.NewsID, newsID},
 			}, bson.D{
@@ -174,3 +174,92 @@ func ExampleCollection_Find() {
 	}
 }
 
+// Aggregate map[string]uint64
+func TestAggregateMapStringUint64(t *testing.T) {
+	/* In a formal environment ignore defer code */var err error;defer func() { if err != nil { xerr.PrintStack(err) } }()
+	ctx := context.Background()
+	newsID := primitive.NewObjectID()
+	list := mo.ManyNewsStatDaily{
+		{
+			Date: "2011-01-01",
+			NewsID: newsID,
+			PlatformUV: map[string]uint64{
+				"ios": 8,
+				"android": 2,
+				"web": 24,
+			},
+		},
+		{
+			Date: "2011-01-02",
+			NewsID: newsID,
+			PlatformUV: map[string]uint64{
+				"ios": 13,
+				"android": 14,
+				"web": 31,
+			},
+		},
+	}
+	_, err = newsStatDailyCool.InsertMany(ctx, &list, mo.InsertManyCommand{}) ; if err != nil {
+	    return
+	}
+	field := mo.NewsStatDaily{}.Field()
+	var pipeline []bson.D
+	pipeline = append(pipeline, bson.D{
+		{"$match", bson.D{
+			{field.NewsID, newsID},
+			{field.Date, bson.D{
+				{"$gte", "2011-01-01"},
+				{"$lte", "2011-01-02"},
+			}},
+		}},
+	})
+
+	pipeline = append(pipeline, bson.D{
+		{"$addFields", bson.D{
+			{"keys", bson.D{{"$objectToArray", "$" + field.PlatformUV}}},
+		},
+		},
+	})
+	pipeline = append(pipeline, bson.D{
+		{
+			"$unwind", "$keys",
+		},
+	})
+	pipeline = append(pipeline, bson.D{
+		{
+			"$group", bson.D{
+				{
+					"_id", bson.D{
+					{"id", "$" + field.Date,},
+					{"key", "$keys.k"},
+				},
+				},
+				{
+					"sumUV", bson.D{
+					{"$sum", "$keys.v"},
+				},
+				},
+			},
+		},
+	})
+	pipeline = append(pipeline, bson.D{
+		{
+			"$group", bson.D{
+				{"_id", "$_id.key"},
+				{"total", bson.D{{"$sum", "$sumUV"}}},
+			},
+		},
+	})
+
+	cursor, err := newsStatDailyCool.Core.Aggregate(ctx, pipeline) ; if err != nil {
+	    return
+	}
+	results := []bson.M{}
+	err = cursor.All(ctx, &results) ; if err != nil {
+	    return
+	}
+	data, err := json.MarshalIndent(results, "", "  ") ; if err != nil {
+	    return
+	}
+	log.Printf("TestAggregateMapStringUint64: results: %s", data)
+}

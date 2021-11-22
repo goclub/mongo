@@ -6,15 +6,31 @@ import (
 )
 
 type Comment struct {
-	ObjectID primitive.ObjectID `bson:"_id,omitempty"`
+	ID primitive.ObjectID `bson:"_id,omitempty"`
 	UserID uint64 `bson:"userID"`
+	NewsID primitive.ObjectID `bson:"newsID"`
 	Message string `bson:"message"`
 	Like uint64 `bson:"like"`
 }
 
+func (d Comment) Field() (f struct {
+	ID      string
+	UserID  string
+	NewsID string
+	Message string
+	Like    string
+} ) {
+	f.ID = "_id"
+	f.UserID = "userID"
+	f.NewsID = "newsID"
+	f.Message = "message"
+	f.Like = "like"
+	return
+}
+
 
 func (v *Comment) BeforeInsert(data BeforeInsertData) (err error) {
-	if v.ObjectID.IsZero() { v.ObjectID = data.ObjectID }
+	if v.ID.IsZero() { v.ID = data.ObjectID }
 	return
 }
 type ManyComment []Comment
@@ -30,9 +46,56 @@ func (many ManyComment) ManyD () (documents []interface{}, err error) {
 }
 
 func (many ManyComment) BeforeInsertMany(data BeforeInsertManyData) (err error) {
-	objectIDs := data.ObjectIDs()
+	IDs := data.ObjectIDs()
 	for i,_ := range many {
-		many[i].ObjectID = objectIDs[i]
+		many[i].ID = IDs[i]
+	}
+	return
+}
+
+type NewsStatDaily struct {
+	ID primitive.ObjectID `bson:"_id,omitempty"`
+	Date string `bson:"date"`
+	NewsID primitive.ObjectID `bson:"newsID"`
+	UV uint64 `bson:"uv"`
+	PV uint64 `bson:"pv"`
+}
+func (v *NewsStatDaily) BeforeInsert(data BeforeInsertData) (err error) {
+	if v.ID.IsZero() { v.ID = data.ObjectID }
+	return
+}
+
+func (d NewsStatDaily) Field() (f struct {
+	ID      string
+	Date  string
+	NewsID string
+	UV    string
+	PV string
+} ) {
+	f.ID = "_id"
+	f.Date = "date"
+	f.NewsID = "newsID"
+	f.UV = "uv"
+	f.PV = "pv"
+	return
+}
+
+type ManyNewsStatDaily []NewsStatDaily
+func (many ManyNewsStatDaily) ManyD () (documents []interface{}, err error) {
+	for _, v := range many {
+		var b []byte
+		b, err = bson.Marshal(v) ; if err != nil {
+			return
+		}
+		documents = append(documents, bson.Raw(b))
+	}
+	return
+}
+
+func (many ManyNewsStatDaily) BeforeInsertMany(data BeforeInsertManyData) (err error) {
+	IDs := data.ObjectIDs()
+	for i,_ := range many {
+		many[i].ID = IDs[i]
 	}
 	return
 }

@@ -54,6 +54,7 @@ func (c Collection) InsertMany(ctx context.Context, documents DocumentMany, cmd 
 	data, err := documents.ManyD() ; if err != nil {
 	    return
 	}
+
 	coreRes, err := c.Core.InsertMany(ctx, data, cmd.Options()...) ; if err != nil {
 		return
 	}
@@ -112,4 +113,7 @@ func (c Collection) FindOne(ctx context.Context, filter interface{}, document Do
 		return
 	}
 	return
+}
+func (c Collection) UpdateOne(ctx context.Context, filter interface{}, update interface{}, cmd UpdateCommand) (*mongo.UpdateResult, error) {
+	return c.Core.UpdateOne(ctx, filter, update, cmd.Options()...)
 }

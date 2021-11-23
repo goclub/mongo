@@ -15,6 +15,7 @@ import (
 	"log"
 	"sync"
 	"testing"
+	"time"
 )
 
 func TestExample(t *testing.T) {
@@ -32,6 +33,7 @@ var newsStatDailyCool *mo.Collection
 func init () {
 	ExampleNewDatabase()
 	ExampleNewCollection()
+	ExampleMigrate()
 }
 func ExampleNewDatabase() {
 	ctx := context.Background()
@@ -43,20 +45,28 @@ func ExampleNewDatabase() {
 	}
 	db = mo.NewDatabase(client, "goclub_mongo")
 }
+type MigrateActions struct {
+
+}
+func (MigrateActions) Migrate_2021_11_23__09_52_CreateNewsStatDailyIndexs(db *mo.Database) (err error) {
+	// create indexes
+	f := mo.NewsStatDaily{}.Field()
+	_, err = newsStatDailyCool.Core.Indexes().CreateOne(context.TODO(), mongo.IndexModel{
+		Keys: bson.D{{f.Date, 1}, {f.NewsID, 1}},
+		Options: mongoOptions.Index().SetUnique(true),
+	}) ; if err != nil {
+		return
+	}
+	return
+}
+// In a formal project you should use `go run cmd/migrate/main.go`, not running in init function
+func ExampleMigrate() {
+	mo.Migrate(db, &MigrateActions{})
+}
 func ExampleNewCollection() {
 	/* In a formal environment ignore defer code */var err error;defer func() { if err != nil { xerr.PrintStack(err) } }()
 	commentColl = mo.NewCollection(db, "comment")
 	newsStatDailyCool = mo.NewCollection(db, "newsStatDaily")
-	// create indexes
-	{
-		f := mo.NewsStatDaily{}.Field()
-		_, err = newsStatDailyCool.Core.Indexes().CreateOne(context.TODO(), mongo.IndexModel{
-			Keys: bson.D{{f.Date, 1}, {f.NewsID, 1}},
-			Options: mongoOptions.Index().SetUnique(true),
-		}) ; if err != nil {
-			return
-		}
-	}
 }
 
 func (suite TestExampleSuite) TestCollection_InsertOne() {
@@ -143,6 +153,7 @@ func ExampleCollection_Find() {
 		comment := mo.Comment{
 			UserID:   1,
 			Message:  "test find",
+			DateTime: time.Now(),
 		}
 		_, err = commentColl.InsertOne(ctx, &comment, mo.InsertOneCommand{}) ; if err != nil {
 		return
@@ -157,8 +168,8 @@ func ExampleCollection_Find() {
 	// FindOne
 	{
 		commentList := mo.ManyComment{
-			{UserID: 2, Message: "x"},
-			{UserID: 2, Message: "y"},
+			{UserID: 2, Message: "x",DateTime: time.Now(),},
+			{UserID: 2, Message: "y",DateTime: time.Now(),},
 		}
 		_, err = commentColl.InsertMany(ctx, &commentList, mo.InsertManyCommand{}) ; if err != nil {
 			return

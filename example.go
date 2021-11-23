@@ -3,6 +3,7 @@ package mo
 import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"time"
 )
 
 type Comment struct {
@@ -11,6 +12,7 @@ type Comment struct {
 	NewsID primitive.ObjectID `bson:"newsID"`
 	Message string `bson:"message"`
 	Like uint64 `bson:"like"`
+	DateTime time.Time `bson:"dateTime"`
 }
 
 func (d Comment) Field() (f struct {
@@ -19,12 +21,14 @@ func (d Comment) Field() (f struct {
 	NewsID string
 	Message string
 	Like    string
+	DateTime string
 } ) {
 	f.ID = "_id"
 	f.UserID = "userID"
 	f.NewsID = "newsID"
 	f.Message = "message"
 	f.Like = "like"
+	f.DateTime = "dateTime"
 	return
 }
 

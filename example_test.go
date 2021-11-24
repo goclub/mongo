@@ -338,13 +338,14 @@ func ExampleGeoJSONPoint() {
 		"location": bson.M{
 			"$geoWithin": bson.M{
 				"$center": []interface{}{
+					// 杭州西湖中心
 					[]float64{120.11947930184483, 30.235950232037645},
-					1,
+					10,
 				},
 			},
 		},
 	}
-	cursor, err := exampleLocationCool.Core.Find(ctx, filter, mongoOptions.Find().SetLimit(500)) ; if err != nil {
+	cursor, err := exampleLocationCool.Core.Find(ctx, filter, mongoOptions.Find().SetLimit(100)) ; if err != nil {
 	    return
 	}
 	err = cursor.All(ctx, &targetList) ; if err != nil {
@@ -353,7 +354,7 @@ func ExampleGeoJSONPoint() {
 	log.Print("len(targetList)", len(targetList))
 	var jsBD09Data [][2]float64
 	for _, location := range targetList {
-		bd09Data := location.Location.BD09()
+		bd09Data := location.Location.WGS84().BD09()
 		jsBD09Data = append(jsBD09Data, [2]float64{bd09Data.Longitude, bd09Data.Latitude})
 	}
 	jsonb , err := json.Marshal(jsBD09Data) ; if err != nil {

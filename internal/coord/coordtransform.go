@@ -1,6 +1,6 @@
 package coordtransform
 
-// ref: https://github.com/qichengzx/coordtransform/blob/master/main.go
+// ref: https://github.com/googollee/eviltransform/blob/master/go/transform.go
 
 import (
 	"math"

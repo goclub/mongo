@@ -28,6 +28,8 @@ github.com/gobuffalo/packd v0.1.0/go.mod h1:M2Juc+hhDXf/PnmBANFCqx4DM3wRbgDvnVWe
 github.com/gobuffalo/packr/v2 v2.0.9/go.mod h1:emmyGweYTm6Kdper+iywB6YK5YzuKchGtJQZ0Odn4pQ=
 github.com/gobuffalo/packr/v2 v2.2.0/go.mod h1:CaAwI0GPIAv+5wKLtv8Afwl+Cm78K/I/VCm/3ptBN+0=
 github.com/gobuffalo/syncx v0.0.0-20190224160051-33c29581e754/go.mod h1:HhnNqWY95UYwwW3uSASeV7vtgYkT2t16hJgV3AEPUpw=
+github.com/goclub/conv v0.0.0-20210628072551-e0fa54344ee8 h1:fV+GkPZgYxDcQoHYYKjweLcrgwkiZQ0o/E4Urj+jKq0=
+github.com/goclub/conv v0.0.0-20210628072551-e0fa54344ee8/go.mod h1:iAu2C+UiczzPo2c9enIIzM5xeLbvpbpPw8bzmL4xt80=
 github.com/goclub/error v0.0.0-20210822120640-22b0cb92e002 h1:tMh1hALlctK4NzWXR+pQnNRcGHoizxWBB0snGBVkwT8=
 github.com/goclub/error v0.0.0-20210822120640-22b0cb92e002/go.mod h1:2ombCAL3uNuhVNevp56iOpelgiQIyxlYkz7t6nWEC18=
 github.com/goclub/type v0.0.0-20210926083058-ec495aa891ff h1:pR8P74qiXgCPKNzq1ASMYzWIQAzU3qub2Y1H0e828aQ=

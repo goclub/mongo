@@ -27,8 +27,8 @@ type TestExampleSuite struct {
 }
 
 var db *mo.Database
-var ExampleCommentColl *mo.Collection
-var ExampleNewsStatDailyColl *mo.Collection
+var exampleCommentColl *mo.Collection
+var exampleNewsStatDailyColl *mo.Collection
 
 func init () {
 	ExampleNewDatabase()
@@ -51,7 +51,7 @@ type MigrateActions struct {
 func (MigrateActions) Migrate_2021_11_23__09_52_CreateExampleNewsStatDailyIndexs(db *mo.Database) (err error) {
 	// create indexes
 	f := mo.ExampleNewsStatDaily{}.Field()
-	_, err = ExampleNewsStatDailyColl.Core.Indexes().CreateOne(context.TODO(), mongo.IndexModel{
+	_, err = exampleNewsStatDailyColl.Core.Indexes().CreateOne(context.TODO(), mongo.IndexModel{
 		Keys: bson.D{{f.Date, 1}, {f.NewsID, 1}},
 		Options: mongoOptions.Index().SetUnique(true),
 	}) ; if err != nil {
@@ -65,8 +65,8 @@ func ExampleMigrate() {
 }
 func ExampleNewCollection() {
 	/* In a formal environment ignore defer code */var err error;defer func() { if err != nil { xerr.PrintStack(err) } }()
-	ExampleCommentColl = mo.NewCollection(db, "exampleComment")
-	ExampleNewsStatDailyColl = mo.NewCollection(db, "exampleNewsStatDaily")
+	exampleCommentColl = mo.NewCollection(db, "exampleComment")
+	exampleNewsStatDailyColl = mo.NewCollection(db, "exampleNewsStatDaily")
 }
 
 func (suite TestExampleSuite) TestCollection_InsertOne() {
@@ -79,7 +79,7 @@ func ExampleCollection_InsertOne() {
 		UserID: 1,
 		Message: "goclub/mongo",
 	}
-	_, err = ExampleCommentColl.InsertOne(ctx, &ExampleComment, mo.InsertOneCommand{}) ; if err != nil {
+	_, err = exampleCommentColl.InsertOne(ctx, &ExampleComment, mo.InsertOneCommand{}) ; if err != nil {
 		return
 	}
 	log.Printf("ExampleCollection_InsertOne: %+v", ExampleComment)
@@ -95,7 +95,7 @@ func ExampleCollection_InsertMany() {
 		{UserID: 1, Message: "a"},
 		{UserID: 1, Message: "b"},
 	}
-	_, err = ExampleCommentColl.InsertMany(ctx, &ExampleCommentList, mo.InsertManyCommand{}) ; if err != nil {
+	_, err = exampleCommentColl.InsertMany(ctx, &ExampleCommentList, mo.InsertManyCommand{}) ; if err != nil {
 		return
 	}
 	log.Printf("ExampleCollection_InsertMany: %+v", ExampleCommentList)
@@ -116,7 +116,7 @@ func ExampleCollection_InsertIgnore() {
 		wg.Add(1)
 		go func() {
 			/* In a formal environment ignore defer code */var err error;defer func() { if err != nil { xerr.PrintStack(err) } }()
-			result, err := ExampleNewsStatDailyColl.UpdateOne(ctx, bson.D{
+			result, err := exampleNewsStatDailyColl.UpdateOne(ctx, bson.D{
 				{field.Date, "2008-08-08"},
 				{field.NewsID, newsID},
 			}, bson.D{
@@ -155,12 +155,12 @@ func ExampleCollection_Find() {
 			Message:  "test find",
 			DateTime: time.Now(),
 		}
-		_, err = ExampleCommentColl.InsertOne(ctx, &ExampleComment, mo.InsertOneCommand{}) ; if err != nil {
+		_, err = exampleCommentColl.InsertOne(ctx, &ExampleComment, mo.InsertOneCommand{}) ; if err != nil {
 		return
 	}
 		findExampleComment := mo.ExampleComment{}
 		// ExampleComment.ObjectID = primitive.NewObjectID() // if unExampleComment this line of code, hasExampleComment will be false
-		hasExampleComment, err := ExampleCommentColl.FindByObjectID(ctx, ExampleComment.ID, &findExampleComment, mo.FindOneCommand{}) ; if err != nil {
+		hasExampleComment, err := exampleCommentColl.FindByObjectID(ctx, ExampleComment.ID, &findExampleComment, mo.FindOneCommand{}) ; if err != nil {
 			return
 		}
 		log.Print("ExampleCollection_Find FindByObjectID: ", findExampleComment, hasExampleComment)
@@ -171,12 +171,12 @@ func ExampleCollection_Find() {
 			{UserID: 2, Message: "x",DateTime: time.Now(),},
 			{UserID: 2, Message: "y",DateTime: time.Now(),},
 		}
-		_, err = ExampleCommentColl.InsertMany(ctx, &ExampleCommentList, mo.InsertManyCommand{}) ; if err != nil {
+		_, err = exampleCommentColl.InsertMany(ctx, &ExampleCommentList, mo.InsertManyCommand{}) ; if err != nil {
 			return
 		}
 		ExampleComment := mo.ExampleComment{}
 		field := ExampleComment.Field()
-		has, err := ExampleCommentColl.FindOne(ctx, bson.D{
+		has, err := exampleCommentColl.FindOne(ctx, bson.D{
 			{field.UserID, 2},
 		}, &ExampleComment, mo.FindOneCommand{}) ; if err != nil {
 		    return
@@ -210,7 +210,7 @@ func TestAggregateMapStringUint64(t *testing.T) {
 			},
 		},
 	}
-	_, err = ExampleNewsStatDailyColl.InsertMany(ctx, &list, mo.InsertManyCommand{}) ; if err != nil {
+	_, err = exampleNewsStatDailyColl.InsertMany(ctx, &list, mo.InsertManyCommand{}) ; if err != nil {
 	    return
 	}
 	field := mo.ExampleNewsStatDaily{}.Field()
@@ -262,7 +262,7 @@ func TestAggregateMapStringUint64(t *testing.T) {
 		},
 	})
 
-	cursor, err := ExampleNewsStatDailyColl.Core.Aggregate(ctx, pipeline) ; if err != nil {
+	cursor, err := exampleNewsStatDailyColl.Core.Aggregate(ctx, pipeline) ; if err != nil {
 	    return
 	}
 	results := []bson.M{}

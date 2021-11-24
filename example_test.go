@@ -28,7 +28,7 @@ type TestExampleSuite struct {
 
 var db *mo.Database
 var commentColl *mo.Collection
-var newsStatDailyCool *mo.Collection
+var newsStatDailyColl *mo.Collection
 
 func init () {
 	ExampleNewDatabase()
@@ -51,7 +51,7 @@ type MigrateActions struct {
 func (MigrateActions) Migrate_2021_11_23__09_52_CreateNewsStatDailyIndexs(db *mo.Database) (err error) {
 	// create indexes
 	f := mo.NewsStatDaily{}.Field()
-	_, err = newsStatDailyCool.Core.Indexes().CreateOne(context.TODO(), mongo.IndexModel{
+	_, err = newsStatDailyColl.Core.Indexes().CreateOne(context.TODO(), mongo.IndexModel{
 		Keys: bson.D{{f.Date, 1}, {f.NewsID, 1}},
 		Options: mongoOptions.Index().SetUnique(true),
 	}) ; if err != nil {
@@ -66,7 +66,7 @@ func ExampleMigrate() {
 func ExampleNewCollection() {
 	/* In a formal environment ignore defer code */var err error;defer func() { if err != nil { xerr.PrintStack(err) } }()
 	commentColl = mo.NewCollection(db, "comment")
-	newsStatDailyCool = mo.NewCollection(db, "newsStatDaily")
+	newsStatDailyColl = mo.NewCollection(db, "newsStatDaily")
 }
 
 func (suite TestExampleSuite) TestCollection_InsertOne() {
@@ -116,7 +116,7 @@ func ExampleCollection_InsertIgnore() {
 		wg.Add(1)
 		go func() {
 			/* In a formal environment ignore defer code */var err error;defer func() { if err != nil { xerr.PrintStack(err) } }()
-			result, err := newsStatDailyCool.UpdateOne(ctx, bson.D{
+			result, err := newsStatDailyColl.UpdateOne(ctx, bson.D{
 				{field.Date, "2008-08-08"},
 				{field.NewsID, newsID},
 			}, bson.D{
@@ -210,7 +210,7 @@ func TestAggregateMapStringUint64(t *testing.T) {
 			},
 		},
 	}
-	_, err = newsStatDailyCool.InsertMany(ctx, &list, mo.InsertManyCommand{}) ; if err != nil {
+	_, err = newsStatDailyColl.InsertMany(ctx, &list, mo.InsertManyCommand{}) ; if err != nil {
 	    return
 	}
 	field := mo.NewsStatDaily{}.Field()
@@ -262,7 +262,7 @@ func TestAggregateMapStringUint64(t *testing.T) {
 		},
 	})
 
-	cursor, err := newsStatDailyCool.Core.Aggregate(ctx, pipeline) ; if err != nil {
+	cursor, err := newsStatDailyColl.Core.Aggregate(ctx, pipeline) ; if err != nil {
 	    return
 	}
 	results := []bson.M{}

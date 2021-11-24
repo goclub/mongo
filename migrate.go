@@ -16,7 +16,7 @@ func Migrate(db *Database, ptr interface{}) {
 	defer func() {
 		log.Print("goclub/mongo: end migrate")
 	}()
-	coll := NewCollection(db, "goclub_mongo_migrate_action")
+	coll := NewCollection(db, "goclubMongoMigrateAction")
 	rPtrValue := reflect.ValueOf(ptr)
 	if rPtrValue.Kind() != reflect.Ptr {
 		panic(xerr.New("ExecMigrate(db, ptr) ptr must be pointer"))

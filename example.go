@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-type Comment struct {
+type ExampleComment struct {
 	ID primitive.ObjectID `bson:"_id,omitempty"`
 	UserID uint64 `bson:"userID"`
 	NewsID primitive.ObjectID `bson:"newsID"`
@@ -15,7 +15,7 @@ type Comment struct {
 	DateTime time.Time `bson:"dateTime"`
 }
 
-func (d Comment) Field() (f struct {
+func (d ExampleComment) Field() (f struct {
 	ID      string
 	UserID  string
 	NewsID string
@@ -33,12 +33,12 @@ func (d Comment) Field() (f struct {
 }
 
 
-func (v *Comment) BeforeInsert(data BeforeInsertData) (err error) {
+func (v *ExampleComment) BeforeInsert(data BeforeInsertData) (err error) {
 	if v.ID.IsZero() { v.ID = data.ObjectID }
 	return
 }
-type ManyComment []Comment
-func (many ManyComment) ManyD () (documents []interface{}, err error) {
+type ManyExampleComment []ExampleComment
+func (many ManyExampleComment) ManyD () (documents []interface{}, err error) {
 	for _, v := range many {
 		var b []byte
 		b, err = bson.Marshal(v) ; if err != nil {
@@ -49,7 +49,7 @@ func (many ManyComment) ManyD () (documents []interface{}, err error) {
 	return
 }
 
-func (many ManyComment) BeforeInsertMany(data BeforeInsertManyData) (err error) {
+func (many ManyExampleComment) BeforeInsertMany(data BeforeInsertManyData) (err error) {
 	IDs := data.ObjectIDs()
 	for i,_ := range many {
 		many[i].ID = IDs[i]
@@ -57,7 +57,7 @@ func (many ManyComment) BeforeInsertMany(data BeforeInsertManyData) (err error) 
 	return
 }
 
-type NewsStatDaily struct {
+type ExampleNewsStatDaily struct {
 	ID primitive.ObjectID `bson:"_id,omitempty"`
 	Date string `bson:"date"`
 	NewsID primitive.ObjectID `bson:"newsID"`
@@ -66,12 +66,12 @@ type NewsStatDaily struct {
 	PlatformUV map[string]uint64 `bson:"platformUV"`
 }
 
-func (v *NewsStatDaily) BeforeInsert(data BeforeInsertData) (err error) {
+func (v *ExampleNewsStatDaily) BeforeInsert(data BeforeInsertData) (err error) {
 	if v.ID.IsZero() { v.ID = data.ObjectID }
 	return
 }
 
-func (d NewsStatDaily) Field() (f struct {
+func (d ExampleNewsStatDaily) Field() (f struct {
 	ID      string
 	Date  string
 	NewsID string
@@ -88,8 +88,8 @@ func (d NewsStatDaily) Field() (f struct {
 	return
 }
 
-type ManyNewsStatDaily []NewsStatDaily
-func (many ManyNewsStatDaily) ManyD () (documents []interface{}, err error) {
+type ManyExampleNewsStatDaily []ExampleNewsStatDaily
+func (many ManyExampleNewsStatDaily) ManyD () (documents []interface{}, err error) {
 	for _, v := range many {
 		var b []byte
 		b, err = bson.Marshal(v) ; if err != nil {
@@ -100,7 +100,7 @@ func (many ManyNewsStatDaily) ManyD () (documents []interface{}, err error) {
 	return
 }
 
-func (many ManyNewsStatDaily) BeforeInsertMany(data BeforeInsertManyData) (err error) {
+func (many ManyExampleNewsStatDaily) BeforeInsertMany(data BeforeInsertManyData) (err error) {
 	IDs := data.ObjectIDs()
 	for i,_ := range many {
 		many[i].ID = IDs[i]

@@ -43,10 +43,46 @@ func ExampleNewDatabase() {
 	err = client.Ping(ctx, readpref.Primary()) ; if err != nil {
 		return
 	}
-	db = mo.NewDatabase(client, "goclub_mongo")
+	db = mo.NewDatabase(client, "goclubMongo")
 }
 type MigrateActions struct {
 
+}
+func (MigrateActions) Migrate_2021_11_23__09_52_CreateExmapleCommentJSONSchema(db *mo.Database) (err error) {
+	f := mo.ExampleComment{}.Field()
+	var jsonSchema = bson.M{
+		"bsonType":             "object",
+		"required":             []string{f.UserID, f.NewsID, f.CreateTime, f.Message},
+		"additionalProperties": false,
+		"properties": bson.M{
+			"_id": bson.M{
+				"bsonType": "objectId",
+			},
+			"userID": bson.M{
+				"bsonType":    "number",
+			},
+			"newsID": bson.M{
+				"bsonType":    "objectId",
+			},
+			"message": bson.M{
+				"bsonType":    "string",
+			},
+			"like": bson.M{
+				"bsonType":    "number",
+			},
+			"createTime": bson.M{
+				"bsonType":    "date",
+			},
+		},
+	}
+	var validator = bson.M{
+		"$jsonSchema": jsonSchema,
+	}
+	opts := mongoOptions.CreateCollection().SetValidator(validator)
+	err = db.Core.CreateCollection(context.TODO(), "exampleComment", opts) ; if err != nil {
+	    return
+	}
+	return
 }
 func (MigrateActions) Migrate_2021_11_23__09_52_CreateExampleNewsStatDailyIndexs(db *mo.Database) (err error) {
 	// create indexes
@@ -75,14 +111,18 @@ func (suite TestExampleSuite) TestCollection_InsertOne() {
 func ExampleCollection_InsertOne() {
 	/* In a formal environment ignore defer code */var err error;defer func() { if err != nil { xerr.PrintStack(err) } }()
 	ctx := context.Background()
-	ExampleComment := mo.ExampleComment{
+	exampleComment := mo.ExampleComment{
 		UserID: 1,
+		NewsID: primitive.NewObjectID(),
 		Message: "goclub/mongo",
+		CreateTime: time.Now(),
 	}
-	_, err = exampleCommentColl.InsertOne(ctx, &ExampleComment, mo.InsertOneCommand{}) ; if err != nil {
+	_, err = exampleCommentColl.InsertOne(ctx, &exampleComment, mo.InsertOneCommand{
+		ByPassDocumentValidation: xtype.Bool(true),
+	}) ; if err != nil {
 		return
 	}
-	log.Printf("ExampleCollection_InsertOne: %+v", ExampleComment)
+	log.Printf("ExampleCollection_InsertOne: %+v", exampleComment)
 }
 
 func (suite TestExampleSuite) TestCollection_InsertMany() {
@@ -91,14 +131,14 @@ func (suite TestExampleSuite) TestCollection_InsertMany() {
 func ExampleCollection_InsertMany() {
 	/* In a formal environment ignore defer code */var err error;defer func() { if err != nil { xerr.PrintStack(err) } }()
 	ctx := context.Background()
-	ExampleCommentList := mo.ManyExampleComment{
-		{UserID: 1, Message: "a"},
-		{UserID: 1, Message: "b"},
+	exampleCommentList := mo.ManyExampleComment{
+		{UserID: 1, Message: "a", NewsID: primitive.NewObjectID(), CreateTime: time.Now()},
+		{UserID: 1, Message: "b", NewsID: primitive.NewObjectID(), CreateTime: time.Now()},
 	}
-	_, err = exampleCommentColl.InsertMany(ctx, &ExampleCommentList, mo.InsertManyCommand{}) ; if err != nil {
+	_, err = exampleCommentColl.InsertMany(ctx, &exampleCommentList, mo.InsertManyCommand{}) ; if err != nil {
 		return
 	}
-	log.Printf("ExampleCollection_InsertMany: %+v", ExampleCommentList)
+	log.Printf("ExampleCollection_InsertMany: %+v", exampleCommentList)
 }
 
 func (suite TestExampleSuite) TestCollection_InsertIgnore() {
@@ -152,8 +192,9 @@ func ExampleCollection_Find() {
 	{
 		ExampleComment := mo.ExampleComment{
 			UserID:   1,
+			NewsID: primitive.NewObjectID(),
 			Message:  "test find",
-			DateTime: time.Now(),
+			CreateTime: time.Now(),
 		}
 		_, err = exampleCommentColl.InsertOne(ctx, &ExampleComment, mo.InsertOneCommand{}) ; if err != nil {
 		return
@@ -167,11 +208,11 @@ func ExampleCollection_Find() {
 	}
 	// FindOne
 	{
-		ExampleCommentList := mo.ManyExampleComment{
-			{UserID: 2, Message: "x",DateTime: time.Now(),},
-			{UserID: 2, Message: "y",DateTime: time.Now(),},
+		exampleCommentList := mo.ManyExampleComment{
+			{UserID: 2, Message: "x",NewsID: primitive.NewObjectID(),CreateTime: time.Now(),},
+			{UserID: 2, Message: "y",NewsID: primitive.NewObjectID(),CreateTime: time.Now(),},
 		}
-		_, err = exampleCommentColl.InsertMany(ctx, &ExampleCommentList, mo.InsertManyCommand{}) ; if err != nil {
+		_, err = exampleCommentColl.InsertMany(ctx, &exampleCommentList, mo.InsertManyCommand{}) ; if err != nil {
 			return
 		}
 		ExampleComment := mo.ExampleComment{}

@@ -12,7 +12,7 @@ type ExampleComment struct {
 	NewsID primitive.ObjectID `bson:"newsID"`
 	Message string `bson:"message"`
 	Like uint64 `bson:"like"`
-	DateTime time.Time `bson:"dateTime"`
+	CreateTime time.Time `bson:"createTime"`
 }
 
 func (d ExampleComment) Field() (f struct {
@@ -21,14 +21,14 @@ func (d ExampleComment) Field() (f struct {
 	NewsID string
 	Message string
 	Like    string
-	DateTime string
+	CreateTime string
 } ) {
 	f.ID = "_id"
 	f.UserID = "userID"
 	f.NewsID = "newsID"
 	f.Message = "message"
 	f.Like = "like"
-	f.DateTime = "dateTime"
+	f.CreateTime = "createTime"
 	return
 }
 

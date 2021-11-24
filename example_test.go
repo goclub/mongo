@@ -29,6 +29,7 @@ type TestExampleSuite struct {
 var db *mo.Database
 var exampleCommentColl *mo.Collection
 var exampleNewsStatDailyColl *mo.Collection
+var exampleLocationCool *mo.Collection
 
 func init () {
 	ExampleNewDatabase()
@@ -44,6 +45,12 @@ func ExampleNewDatabase() {
 		return
 	}
 	db = mo.NewDatabase(client, "goclubMongo")
+}
+func ExampleNewCollection() {
+	/* In a formal environment ignore defer code */var err error;defer func() { if err != nil { xerr.PrintStack(err) } }()
+	exampleCommentColl = mo.NewCollection(db, "exampleComment")
+	exampleNewsStatDailyColl = mo.NewCollection(db, "exampleNewsStatDaily")
+	exampleLocationCool = mo.NewCollection(db, "exampleLocation")
 }
 type MigrateActions struct {
 
@@ -98,11 +105,6 @@ func (MigrateActions) Migrate_2021_11_23__09_52_CreateExampleNewsStatDailyIndexs
 // In a formal project you should use `go run cmd/migrate/main.go`, not running in init function
 func ExampleMigrate() {
 	mo.Migrate(db, &MigrateActions{})
-}
-func ExampleNewCollection() {
-	/* In a formal environment ignore defer code */var err error;defer func() { if err != nil { xerr.PrintStack(err) } }()
-	exampleCommentColl = mo.NewCollection(db, "exampleComment")
-	exampleNewsStatDailyColl = mo.NewCollection(db, "exampleNewsStatDaily")
 }
 
 func (suite TestExampleSuite) TestCollection_InsertOne() {
@@ -226,8 +228,11 @@ func ExampleCollection_Find() {
 	}
 }
 
+func (suite TestExampleSuite) TestAggregateMapStringUint64() {
+	ExampleAggregateMapStringUint64()
+}
 // Aggregate map[string]uint64
-func TestAggregateMapStringUint64(t *testing.T) {
+func ExampleAggregateMapStringUint64() {
 	/* In a formal environment ignore defer code */var err error;defer func() { if err != nil { xerr.PrintStack(err) } }()
 	ctx := context.Background()
 	newsID := primitive.NewObjectID()
@@ -314,4 +319,45 @@ func TestAggregateMapStringUint64(t *testing.T) {
 	    return
 	}
 	log.Printf("TestAggregateMapStringUint64: results: %s", data)
+}
+
+func (suite TestExampleSuite) TestGeoJSONPoint() {
+	ExampleGeoJSONPoint()
+}
+// Aggregate map[string]uint64
+func ExampleGeoJSONPoint() {
+	/* In a formal environment ignore defer code */var err error;defer func() { if err != nil { xerr.PrintStack(err) } }()
+	ctx := context.Background()
+	_, err = exampleLocationCool.InsertMany(ctx, &hanzhouWestLakeList, mo.InsertManyCommand{
+		Ordered: xtype.Bool(true),
+	}) ; if err != nil {
+	    return
+	}
+	var targetList mo.ManyExampleLocation
+	filter := bson.M{
+		"location": bson.M{
+			"$geoWithin": bson.M{
+				"$center": []interface{}{
+					[]float64{120.11947930184483, 30.235950232037645},
+					1,
+				},
+			},
+		},
+	}
+	cursor, err := exampleLocationCool.Core.Find(ctx, filter, mongoOptions.Find().SetLimit(500)) ; if err != nil {
+	    return
+	}
+	err = cursor.All(ctx, &targetList) ; if err != nil {
+	    return
+	}
+	log.Print("len(targetList)", len(targetList))
+	var jsBD09Data [][2]float64
+	for _, location := range targetList {
+		bd09Data := location.Location.BD09()
+		jsBD09Data = append(jsBD09Data, [2]float64{bd09Data.Longitude, bd09Data.Latitude})
+	}
+	jsonb , err := json.Marshal(jsBD09Data) ; if err != nil {
+	    return
+	}
+	log.Print("jsBD09Data:\n", string(jsonb))
 }

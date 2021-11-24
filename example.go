@@ -107,3 +107,44 @@ func (many ManyExampleNewsStatDaily) BeforeInsertMany(data BeforeInsertManyData)
 	}
 	return
 }
+
+
+
+type ExampleLocation struct {
+	ID primitive.ObjectID `bson:"_id,omitempty"`
+	Location Point `bson:"location"`
+}
+
+func (v *ExampleLocation) BeforeInsert(data BeforeInsertData) (err error) {
+	if v.ID.IsZero() { v.ID = data.ObjectID }
+	return
+}
+
+func (d ExampleLocation) Field() (f struct {
+	ID      string
+	Location  string
+} ) {
+	f.ID = "_id"
+	f.Location = "location"
+	return
+}
+
+type ManyExampleLocation []ExampleLocation
+func (many ManyExampleLocation) ManyD () (documents []interface{}, err error) {
+	for _, v := range many {
+		var b []byte
+		b, err = bson.Marshal(v) ; if err != nil {
+			return
+		}
+		documents = append(documents, bson.Raw(b))
+	}
+	return
+}
+
+func (many ManyExampleLocation) BeforeInsertMany(data BeforeInsertManyData) (err error) {
+	IDs := data.ObjectIDs()
+	for i,_ := range many {
+		many[i].ID = IDs[i]
+	}
+	return
+}

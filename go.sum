@@ -30,8 +30,6 @@ github.com/gobuffalo/packr/v2 v2.2.0/go.mod h1:CaAwI0GPIAv+5wKLtv8Afwl+Cm78K/I/V
 github.com/gobuffalo/syncx v0.0.0-20190224160051-33c29581e754/go.mod h1:HhnNqWY95UYwwW3uSASeV7vtgYkT2t16hJgV3AEPUpw=
 github.com/goclub/error v0.0.0-20210822120640-22b0cb92e002 h1:tMh1hALlctK4NzWXR+pQnNRcGHoizxWBB0snGBVkwT8=
 github.com/goclub/error v0.0.0-20210822120640-22b0cb92e002/go.mod h1:2ombCAL3uNuhVNevp56iOpelgiQIyxlYkz7t6nWEC18=
-github.com/goclub/type v0.0.0-20210922074243-fe983fc79514 h1:8pv28lqWBcX6n9K/C4V+7nQGKGZo7ldFUE7kwwTFrLM=
-github.com/goclub/type v0.0.0-20210922074243-fe983fc79514/go.mod h1:WRsGzTWnrX2dgtjdRIXMIzmn7To5MDgro7ZCAhkZfWo=
 github.com/goclub/type v0.0.0-20210926083058-ec495aa891ff h1:pR8P74qiXgCPKNzq1ASMYzWIQAzU3qub2Y1H0e828aQ=
 github.com/goclub/type v0.0.0-20210926083058-ec495aa891ff/go.mod h1:WRsGzTWnrX2dgtjdRIXMIzmn7To5MDgro7ZCAhkZfWo=
 github.com/golang/snappy v0.0.1 h1:Qgr9rKW7uDUkrbSmQeiDsGa8SjGyCOGtuasMWwvp2P4=

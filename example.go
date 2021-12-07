@@ -6,6 +6,49 @@ import (
 	"time"
 )
 
+type ExampleMovie struct {
+	ID primitive.ObjectID `bson:"_id,omitempty"`
+	Title     string   `bson:"title"`
+	Year      int      `bson:"year"`
+	Genres    []string `bson:"genres"`
+	Rated     string   `bson:"rated"`
+	Languages []string `bson:"languages"`
+	Released  time.Time   `bson:"released"`
+	Awards    ExampleMovieAwards `bson:"awards"`
+	Cast      []string `bson:"cast"`
+	Directors []string `bson:"directors"`
+	LastUpdated time.Time `bson:"lastupdated"`
+}
+type ExampleMovieAwards struct {
+	Wins        int    `bson:"wins"`
+	Nominations int    `bson:"nominations"`
+	Text        string `bson:"text"`
+}
+func (v *ExampleMovie) BeforeInsert(data BeforeInsertData) (err error) {
+	if v.ID.IsZero() { v.ID = data.ObjectID }
+	return
+}
+type ManyExampleMovie []ExampleMovie
+
+func (many ManyExampleMovie) ManyD() (documents []interface{}, err error) {
+	for _, v := range many {
+		var b []byte
+		b, err = bson.Marshal(v) ; if err != nil {
+			return
+		}
+		documents = append(documents, bson.Raw(b))
+	}
+	return
+}
+
+func (many ManyExampleMovie) BeforeInsertMany(data BeforeInsertManyData) (err error) {
+	IDs := data.ObjectIDs()
+	for i,_ := range many {
+		many[i].ID = IDs[i]
+	}
+	return
+}
+
 type ExampleComment struct {
 	ID primitive.ObjectID `bson:"_id,omitempty"`
 	UserID uint64 `bson:"userID"`

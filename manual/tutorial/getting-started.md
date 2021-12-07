@@ -19,6 +19,8 @@ permalink: /manual/tutorial/getting-started/
 
 [点击查看示例代码](./getting-started-insert_test.go)
 
+[https://github.com/goclub/mongo/blob/main/manual/tutorial/getting-started-insert_test.go](https://github.com/goclub/mongo/blob/main/manual/tutorial/getting-started-insert_test.go)
+
 插入操作会返回包含每个成功插入的文档的 _id 的数组。 Collection.InsertMany 会自动将这些 _id 赋值给 mo.ManyExampleMovie,
 因为 mo.ManyExampleMovie 实现了
 

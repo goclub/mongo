@@ -1,5 +1,5 @@
 ---
-permalink: /mongo/manual/tutorial/getting-started/
+permalink: /manual/tutorial/getting-started/
 ---
 
 # 开始

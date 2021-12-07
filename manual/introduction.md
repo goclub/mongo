@@ -1,5 +1,5 @@
 ---
-permalink: /mongo/manual/introduction/
+permalink: /manual/introduction/
 ---
 
 # MongoDB 简介

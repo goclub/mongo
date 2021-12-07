@@ -1,5 +1,5 @@
 ---
-permalink: /manual/tutorial/getting-started/
+permalink: /mongo/manual/tutorial/getting-started/
 ---
 
 # 开始
@@ -9,7 +9,7 @@ permalink: /manual/tutorial/getting-started/
 
 ## 插入
 
-将 document 存储在 [collections](https://docs.mongodb.com/manual/core/databases-and-collections/) 中。集合类似于关系数据库中的表。如果一个集合不存在，MongoDB 将在您第一次为该集合存储数据时创建该集合。
+将 document 存储在 [collections](/mongo/manual/core/databases-and-collections/) 中。集合类似于关系数据库中的表。如果一个集合不存在，MongoDB 将在您第一次为该集合存储数据时创建该集合。
 
 下面的示例使用 [Collection.InsertMany](https://pkg.go.dev/github.com/goclub/mongo#Collection.InsertMany)db.collection.insertMany ()方法将新文档插入到电影集合中。
 
@@ -42,17 +42,17 @@ func (many ManyExampleMovie) BeforeInsertMany(data BeforeInsertManyData) (err er
 
 ### 查询文档示例
 
-- [查询文档](/manual/tutorial/query-documents/)
-- [嵌套式文档的查询](/manual/tutorial/query-embedded-documents/))
-- [查询数组](/manual/tutorial/query-arrays/)
-- [查询嵌入式文档数组](/manual/tutorial/query-array-of-documents/)
-- [从查询返回的项目字段](/manual/tutorial/project-fields-from-query-results/)
-- [查询空字段或缺失字段](/manual/tutorial/query-for-null-fields/)
+- [查询文档](/mongo/manual/tutorial/query-documents/)
+- [嵌套式文档的查询](/mongo/manual/tutorial/query-embedded-documents/))
+- [查询数组](/mongo/manual/tutorial/query-arrays/)
+- [查询嵌入式文档数组](/mongo/manual/tutorial/query-array-of-documents/)
+- [从查询返回的项目字段](/mongo/manual/tutorial/project-fields-from-query-results/)
+- [查询空字段或缺失字段](/mongo/manual/tutorial/query-for-null-fields/)
 
 ### 更新文档示例
 
-- [更新文档](/manual/tutorial/update-documents/)
+- [更新文档](/mongo/manual/tutorial/update-documents/)
 
 ### 删除文档示例
-- [删除文档](/manual/tutorial/remove-documents/)
+- [删除文档](/mongo/manual/tutorial/remove-documents/)
 

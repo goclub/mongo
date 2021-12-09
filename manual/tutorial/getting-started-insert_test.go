@@ -11,11 +11,8 @@ import (
 	"time"
 )
 
-var db *mo.Database
-var moviesColl  *mo.Collection
-
-func init () {
-	/* In a formal environment ignore defer code */var err error;defer func() { if err != nil { panic(err) } }()
+func TestInsert(t *testing.T) {
+	/* In a formal environment ignore defer code */var err error;defer func() { if err != nil { xerr.PrintStack(err) } }()
 	ctx := context.Background()
 	client, err := mongo.Connect(ctx, mongoOptions.Client().ApplyURI("mongodb://goclub:goclub@localhost:27017/goclub?authSource=goclub")) ; if err != nil {
 		return
@@ -23,13 +20,9 @@ func init () {
 	err = client.Ping(ctx, readpref.Primary()) ; if err != nil {
 		return
 	}
-	db = mo.NewDatabase(client, "goclub")
-	moviesColl = mo.NewCollection(db, "movies")
-}
-
-func TestInsert(t *testing.T) {
-	/* In a formal environment ignore defer code */var err error;defer func() { if err != nil { xerr.PrintStack(err) } }()
-	ctx := context.Background()
+	db := mo.NewDatabase(client, "goclub")
+	moviesColl := mo.NewCollection(db, "movies")
+	// 正文开始
 	documents := mo.ManyExampleMovie{
 		{
 			Title: "Titanic",
@@ -37,7 +30,7 @@ func TestInsert(t *testing.T) {
 			Genres: []string{"Drama", "Romance"},
 			Rated: "PG-13",
 			Languages: []string{"English", "French", "German", "Swedish", "Italian", "Russian" },
-			Released: time.Date(1997, 12, 19, 0,0,0,0,time.UTC),
+			Released: time.Date(1997, 12, 19, 0,0,0,0,time.UTC), // 中国时区用 time.FixedZone("CST", 8*3600) 代替 time.UTC
 			Awards: mo.ExampleMovieAwards{
 				Wins:        127,
 				Nominations: 63,
@@ -88,11 +81,14 @@ func TestInsert(t *testing.T) {
 				Nominations: 6,
 				Text:        "Won 3 Oscars. Another 6 wins & 6 nominations.",
 			},
-			LastUpdated: time.Date(2015, 9, 4, 0,22,54, 0,time.UTC),
+			// LastUpdated 可能为 null 所以使用指针类型
+			LastUpdated: func() *time.Time{
+				value := time.Date(2015, 9, 4, 0,22,54, 0,time.UTC)
+				return &value
+			}(),
 			Directors: []string{"Michael Curtiz"},
 		},
 	}
-
 	_, err = moviesColl.InsertMany(ctx, documents, mo.InsertManyCommand{}) ; if err != nil {
 	    return
 	}

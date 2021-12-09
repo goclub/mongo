@@ -17,7 +17,7 @@ type ExampleMovie struct {
 	Awards    ExampleMovieAwards `bson:"awards"`
 	Cast      []string `bson:"cast"`
 	Directors []string `bson:"directors"`
-	LastUpdated time.Time `bson:"lastupdated"`
+	LastUpdated *time.Time `bson:"lastupdated"`
 }
 type ExampleMovieAwards struct {
 	Wins        int    `bson:"wins"`

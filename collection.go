@@ -27,7 +27,7 @@ type ResultInsertOne struct {
 func (res ResultInsertOne) InsertedObjectID() primitive.ObjectID {
 	return res.InsertedID.(primitive.ObjectID)
 }
-func (c Collection) InsertOne(ctx context.Context, document Document, cmd InsertOneCommand) (result ResultInsertOne, err error) {
+func (c *Collection) InsertOne(ctx context.Context, document Document, cmd InsertOneCommand) (result ResultInsertOne, err error) {
 	defer func() { if err != nil { err = xerr.WithStack(err) } }()
 	coreRes, err := c.Core.InsertOne(ctx, document, cmd.Options()...) ; if err != nil {
 	    return
@@ -49,7 +49,7 @@ func (res ResultInsertMany) InsertedObjectIDs() (insertedObjectIDs []primitive.O
 	}
 	return
 }
-func (c Collection) InsertMany(ctx context.Context, documents DocumentMany, cmd InsertManyCommand) (result ResultInsertMany, err error) {
+func (c *Collection) InsertMany(ctx context.Context, documents DocumentMany, cmd InsertManyCommand) (result ResultInsertMany, err error) {
 	defer func() { if err != nil { err = xerr.WithStack(err) } }()
 	data, err := documents.ManyD() ; if err != nil {
 	    return
@@ -67,7 +67,7 @@ func (c Collection) InsertMany(ctx context.Context, documents DocumentMany, cmd 
 	return
 }
 
-func (c Collection) FindByObjectID(ctx context.Context, objectID primitive.ObjectID, document Document, cmd FindOneCommand) (has bool, err error) {
+func (c *Collection) FindByObjectID(ctx context.Context, objectID primitive.ObjectID, document Document, cmd FindOneCommand) (has bool, err error) {
 	defer func() { if err != nil { err = xerr.WithStack(err) } }()
 	res := c.Core.FindOne(ctx, bson.D{{"_id", objectID}}, cmd.Options()...)
 	err = res.Err()
@@ -91,7 +91,7 @@ func (c Collection) FindByObjectID(ctx context.Context, objectID primitive.Objec
 	return
 }
 
-func (c Collection) FindOne(ctx context.Context, filter interface{}, document Document, cmd FindOneCommand) (has bool, err error) {
+func (c *Collection) FindOne(ctx context.Context, filter interface{}, document Document, cmd FindOneCommand) (has bool, err error) {
 	defer func() { if err != nil { err = xerr.WithStack(err) } }()
 	res := c.Core.FindOne(ctx, filter, cmd.Options()...)
 	err = res.Err()
@@ -114,6 +114,14 @@ func (c Collection) FindOne(ctx context.Context, filter interface{}, document Do
 	}
 	return
 }
-func (c Collection) UpdateOne(ctx context.Context, filter interface{}, update interface{}, cmd UpdateCommand) (*mongo.UpdateResult, error) {
+func (c *Collection) Find(ctx context.Context, filter interface{}, cmd FindCommand) (cursor *mongo.Cursor, err error) {
+	defer func() { if err != nil { err = xerr.WithStack(err) } }()
+	cursor, err = c.Core.Find(ctx, filter, cmd.Options()...) ; if err != nil {
+	    return
+	}
+	return
+}
+func (c *Collection) UpdateOne(ctx context.Context, filter interface{}, update interface{}, cmd UpdateCommand) (updateResult *mongo.UpdateResult, err error) {
+	defer func() { if err != nil { err = xerr.WithStack(err) } }()
 	return c.Core.UpdateOne(ctx, filter, update, cmd.Options()...)
 }

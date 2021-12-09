@@ -16,11 +16,10 @@ MongoDB 中的记录是一个document，它是由字段和值对组成的数据�
 
 ![](https://docs.mongodb.com/manual/images/crud-annotated-document.bakedsvg.svg)
 
-使用 document 的好处是:
 
->  document 指的是 document
+>  文档指的是 document
 
-使用文件的好处是:
+使用文档的好处是:
 
 1. 在许多编程语言中(i.e. objects)  document 是原生类型
 1. 嵌套(多级)的 document 和数组减少了多表 join 的需求
@@ -33,8 +32,8 @@ MongoDB 将 document 存储在集合中，集合类似于关系数据库中的�
 
 除了集合之外，MongoDB 还支持:
 
-1. Read-only [Views](/mongo/manual/core/views/) - 只读视图 (从 MongoDB 3.4开始支持)
-2. [On-Demand Materialized Views](/mongo/manual/core/materialized-views/) - 按需实现视图 (从 MongoDB 4.2开始支持)
+1. Read-only [Views](/manual/core/views/) - 只读视图 (从 MongoDB 3.4开始支持)
+2. [On-Demand Materialized Views](/manual/core/materialized-views/) - 按需实现视图 (从 MongoDB 4.2开始支持)
 
 ## 主要特点
 
@@ -51,12 +50,12 @@ MongoDB 提供高性能的数据持久性,
 
 mongoDB 支持丰富的查询语言来支持读写操作(CRUD) ，以及:
 
-- Data Aggregation [数据聚合](/mongo/manual/core/aggregation-pipeline/)
-- Text Search [文字搜寻](/mongo/manual/text-search/) 和 Geospatial Queries [地理空间查询](/mongo/manual/tutorial/geospatial-tutorial/).
+- Data Aggregation [数据聚合](/manual/core/aggregation-pipeline/)
+- Text Search [文字搜寻](/manual/text-search/) 和 Geospatial Queries [地理空间查询](/manual/tutorial/geospatial-tutorial/).
 
 ### 高可用性
 
-MongoDB的 [副本集](/mongo/manual/replication/)提供:
+MongoDB的 [副本集](/manual/replication/)提供:
 
 - 自动故障转移
 - 数据冗余
@@ -67,13 +66,13 @@ MongoDB的 [副本集](/mongo/manual/replication/)提供:
 
 MongoDB 核心功能的一部分是提供水平可伸缩性:
 
-- 将数据[分布](/mongo/manual/sharding/#std-label-sharding-introduction)在一组机器上
+- 将数据[分布](/manual/sharding/#std-label-sharding-introduction)在一组机器上
 - Starting in 3.4, MongoDB supports creating zones of data based on the shard key. In a balanced cluster, MongoDB directs reads and writes covered by a zone only to those shards inside the zone. See the Zones manual page for more information.
 
 ### 支持多种存储引擎
 
-- [WiredTiger Storage Engine](/mongo/manual/core/security-encryption-at-rest/) (including support for Encryption at Rest)
-- [In-Memory Storage Engine](/mongo/manual/core/inmemory/).
+- [WiredTiger Storage Engine](/manual/core/security-encryption-at-rest/) (including support for Encryption at Rest)
+- [In-Memory Storage Engine](/manual/core/inmemory/).
 
 此外，MongoDB 提供了可插拔的存储引擎 API，允许第三方为 MongoDB 开发存储引擎。
 

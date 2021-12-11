@@ -79,6 +79,55 @@ filter := bson.M{
 
 [点击查看示例代码](./getting-started-filter-data_test.go)
 
+## 指定返回字段
+
+要指定要返回的字段，请将一个`mo.FindCommand{ Projection: bson.M{...} }`传递给 [Collection.Find](https://pkg.go.dev/github.com/goclub/mongo#Collection.Find) 方法。
+
+- `<field>: 1` 在返回的文档中包含字段
+- `<field>: 0` 在返回的文档中排除字段
+
+在 Go 中，运行以下查询，返回电影集合中所有文档的 `id`、`title`、`directors`和`year`字段:
+
+```go
+cursor, err := moviesColl.Find(ctx, filter, mo.FindCommand{
+        Projection: bson.M{
+            "title": 1,
+            "directors": 1,
+            "year": 1,
+        },
+    }) ; if err != nil {
+    return
+}
+    list := []bson.M{}
+    err = cursor.All(ctx, &list) ; if err != nil {
+    return
+}
+```
+
+您不必指定 `_id` 字段来返回该字段。默认情况下它会返回。若要排除该字段，请在 `projection` 中将其设置为`0`。例如，运行以下查询只返回标题和匹配文档中的类型字段:
+
+```go
+cursor, err := moviesColl.Find(ctx, filter, mo.FindCommand{
+    Projection: bson.M{
+        "_id": 0,
+        "title": 1,
+        "genres": 1,
+    },
+}) ; if err != nil {
+    return
+}
+list := []bson.M{}
+err = cursor.All(ctx, &list) ; if err != nil {
+    return
+}
+```
+
+[点击查看示例代码](./getting-started-projection_test.go)
+
+## 聚合
+
+
+
 ## 其他例子
 
 ### 查询文档示例

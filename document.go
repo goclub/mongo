@@ -11,7 +11,7 @@ type Document interface {
 type BeforeInsertData struct {
 	ObjectID primitive.ObjectID
 }
-type DocumentMany interface {
+type ManyDocument interface {
 	ManyD() (documents []interface{}, err error)
 	BeforeInsertMany(data BeforeInsertManyData) (err error)
 }

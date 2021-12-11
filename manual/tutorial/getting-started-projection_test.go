@@ -6,6 +6,7 @@ import (
 	xerr "github.com/goclub/error"
 	mo "github.com/goclub/mongo"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	mongoOptions "go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -34,9 +35,15 @@ func TestProjection(t *testing.T) {
 				"year": 1,
 			},
 		}) ; if err != nil {
-		return
-	}
-		list := []bson.M{}
+			return
+		}
+		type partMovies struct {
+			ID primitive.ObjectID `bson:"_id"`
+			Title string `bson:"title"`
+			Directors []string `bson:"directors"`
+			Year int `bson:"year"`
+		}
+		list := []partMovies{}
 		err = cursor.All(ctx, &list) ; if err != nil {
 		return
 	}
@@ -57,7 +64,11 @@ func TestProjection(t *testing.T) {
 		}) ; if err != nil {
 		return
 	}
-		list := []bson.M{}
+		type partMovies struct {
+			Title string `bson:"title"`
+			Genres []string `bson:"genres"`
+		}
+		list := []partMovies{}
 		err = cursor.All(ctx, &list) ; if err != nil {
 		return
 	}

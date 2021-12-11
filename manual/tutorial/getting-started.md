@@ -17,6 +17,9 @@ permalink: /manual/tutorial/getting-started/
 
 下面的示例使用 `Collection.InsertMany` 方法将新文档插入到电影集合中。
 
+> goclub/mongo 使用了 [Document](https://pkg.go.dev/github.com/goclub/mongo#Document) 和 [ManyDocument](https://pkg.go.dev/github.com/goclub/mongo#ManyDocument)
+> 作为一些方法的入参,定义一些满足 Document ManyDocument 接口的结构体能让减少很多重复的工作量.让代码更健壮
+
 [点击查看示例代码](./getting-started-insert_test.go)
 
 
@@ -44,7 +47,10 @@ func (many ManyExampleMovie) BeforeInsertMany(data BeforeInsertManyData) (err er
 
 ## 按条件查询数据
 
-> 你可能看到 bson.M bson.D bson.D bson.E 会有点懵,后续章节会解释说明他们的区别和作用
+> 你可能看到 bson.M bson.D bson.A bson.E 会有点懵
+> 如果基于 json 去理解: `bson.A` 表示 `array`, `bson.D`和 `bson.M` 对应 `object`
+> 因为 go 的map遍历时是无序的所以一般情况下操作符(filter)类型的参数用 `bson.M`,插入数据类型时用 `bson.D`
+> `bson.E` 是用来实现 `bson.D`的,自己去看下他们的源码就能很快理解了
 
 在 filter 中设置查询条件传递给 [Collection.Find](https://pkg.go.dev/github.com/goclub/mongo#Collection.Find) 方法。
 
@@ -126,6 +132,36 @@ err = cursor.All(ctx, &list) ; if err != nil {
 
 ## 聚合
 
+可以使用聚合对多个文档中的值进行分组，并返回单个结果。MongoDB 中的聚合是通过[聚合管道](/manual/aggregation/#std-label-aggregation-framework)执行的。
+
+虽然 find() 操作也可以查询数据，但是与简单的 CRUD 操作相比，聚合管道允许您操作数据、执行计算和编写表达能力更强的查询。
+
+
+在 shell 中，运行以下聚合管道来计算每种类型值的出现次数:
+
+```shell
+db.movies.aggregate( [
+   { $unwind: "$genres" },
+   {
+     $group: {
+       _id: "$genres",
+       genreCount: { $sum: 1 }
+     }
+   },
+   { $sort: { "genreCount": -1 } }
+])
+```
+
+> 因为 5.0 版本之前不支持 `$group: {_id: "$genres", genreCount: { $count: { } } }` 所以本文档使用 `$sum: 1` 代替 $group 中的 $count.
+
+管道用途:
+
+- [`$unwind`](/manual/reference/operator/aggregation/unwind/#mongodb-pipeline-pipe.-unwind) 将指定数组(`$genres`)中的字段打平
+- [`$group`](/manual/reference/operator/aggregation/group/#mongodb-pipeline-pipe.-group) 分组处理
+- [`$sort`](/manual/reference/operator/aggregation/sort/#mongodb-pipeline-pipe.-sort) 排序
+
+
+[点击查看示例代码](./getting-started-aggregate_test.go)
 
 
 ## 其他例子

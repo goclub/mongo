@@ -49,7 +49,7 @@ func (res ResultInsertMany) InsertedObjectIDs() (insertedObjectIDs []primitive.O
 	}
 	return
 }
-func (c *Collection) InsertMany(ctx context.Context, documents DocumentMany, cmd InsertManyCommand) (result ResultInsertMany, err error) {
+func (c *Collection) InsertMany(ctx context.Context, documents ManyDocument, cmd InsertManyCommand) (result ResultInsertMany, err error) {
 	defer func() { if err != nil { err = xerr.WithStack(err) } }()
 	data, err := documents.ManyD() ; if err != nil {
 	    return
@@ -124,4 +124,8 @@ func (c *Collection) Find(ctx context.Context, filter interface{}, cmd FindComma
 func (c *Collection) UpdateOne(ctx context.Context, filter interface{}, update interface{}, cmd UpdateCommand) (updateResult *mongo.UpdateResult, err error) {
 	defer func() { if err != nil { err = xerr.WithStack(err) } }()
 	return c.Core.UpdateOne(ctx, filter, update, cmd.Options()...)
+}
+func (c *Collection) Aggregate(ctx context.Context, pipeline interface{}, cmd AggregateCommand) (cursor *mongo.Cursor, err error) {
+	defer func() { if err != nil { err = xerr.WithStack(err) } }()
+	return c.Core.Aggregate(ctx, pipeline, cmd.Options()...)
 }

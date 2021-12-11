@@ -321,3 +321,77 @@ func (c UpdateCommand) Options ()(opt []*options.UpdateOptions) {
 	}
 	return
 }
+
+type AggregateCommand struct {
+	// If true, the operation can write to temporary files in the _tmp subdirectory of the database directory path on
+	// the server. The default value is false.
+	AllowDiskUse xtype.OptionBool
+
+	// The maximum number of documents to be included in each batch returned by the server.
+	BatchSize xtype.OptionInt32
+
+	// If true, writes executed as part of the operation will opt out of document-level validation on the server. This
+	// option is valid for MongoDB versions >= 3.2 and is ignored for previous server versions. The default value is
+	// false. See https://docs.mongodb.com/manual/core/schema-validation/ for more information about document
+	// validation.
+	BypassDocumentValidation xtype.OptionBool
+
+	// Specifies a collation to use for string comparisons during the operation. This option is only valid for MongoDB
+	// versions >= 3.4. For previous server versions, the driver will return an error if this option is used. The
+	// default value is nil, which means the default collation of the collection will be used.
+	Collation *options.Collation
+
+	// The maximum amount of time that the query can run on the server. The default value is nil, meaning that there
+	// is no time limit for query execution.
+	MaxTime xtype.OptionDuration
+
+	// The maximum amount of time that the server should wait for new documents to satisfy a tailable cursor query.
+	// This option is only valid for MongoDB versions >= 3.2 and is ignored for previous server versions.
+	MaxAwaitTime xtype.OptionDuration
+
+	// A string that will be included in server logs, profiling logs, and currentOp queries to help trace the operation.
+	// The default is the empty string, which means that no comment will be included in the logs.
+	Comment xtype.OptionString
+
+	// The index to use for the aggregation. This should either be the index name as a string or the index specification
+	// as a document. The hint does not apply to $lookup and $graphLookup aggregation stages. The driver will return an
+	// error if the hint parameter is a multi-key map. The default value is nil, which means that no hint will be sent.
+	Hint interface{}
+
+	// Specifies parameters for the aggregate expression. This option is only valid for MongoDB versions >= 5.0. Older
+	// servers will report an error for using this option. This must be a document mapping parameter names to values.
+	// Values must be constant or closed expressions that do not reference document fields. Parameters can then be
+	// accessed as variables in an aggregate expression context (e.g. "$$var").
+	Let interface{}
+}
+
+func (c AggregateCommand) Options ()(opt []*options.AggregateOptions) {
+	if c.AllowDiskUse.Valid() {
+		opt = append(opt, options.Aggregate().SetAllowDiskUse(c.AllowDiskUse.Unwrap()))
+	}
+	if c.BatchSize.Valid() {
+		opt = append(opt, options.Aggregate().SetBatchSize(c.BatchSize.Unwrap()))
+	}
+	if c.BypassDocumentValidation.Valid() {
+		opt = append(opt, options.Aggregate().SetBypassDocumentValidation(c.BypassDocumentValidation.Unwrap()))
+	}
+	if c.Collation != nil {
+		opt = append(opt, options.Aggregate().SetCollation(c.Collation))
+	}
+	if c.MaxTime.Valid() {
+		opt = append(opt, options.Aggregate().SetMaxTime(c.MaxTime.Unwrap()))
+	}
+	if c.MaxAwaitTime.Valid() {
+		opt = append(opt, options.Aggregate().SetMaxAwaitTime(c.MaxAwaitTime.Unwrap()))
+	}
+	if c.Comment.Valid() {
+		opt = append(opt, options.Aggregate().SetComment(c.Comment.Unwrap()))
+	}
+	if c.Hint != nil {
+		opt = append(opt, options.Aggregate().SetHint(c.Hint))
+	}
+	if c.Let != nil {
+		opt = append(opt, options.Aggregate().SetLet(c.Let))
+	}
+	return
+}

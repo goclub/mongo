@@ -37,7 +37,8 @@ func TestTransactions(t *testing.T) {
 	}
 	defer session.EndSession(ctx)
 	// cbResult 最终会作为 WithTransaction 的出参 result
-	result, err := session.WithTransaction(ctx, func(sessCtx mongo.SessionContext) (cbResult interface{}, err error) {
+	// cbResult 和 txResult 可用于传递数据建议查看 session.WithTransaction 的源码了解
+	txResult, err := session.WithTransaction(ctx, func(sessCtx mongo.SessionContext) (cbResult interface{}, err error) {
 		ctx := 0;_=ctx // redefine ctx avert bug
 		_, err = fooColl.Core.InsertOne(sessCtx, bson.D{{"abc", 1}}) ; if err != nil {
 		    return
@@ -45,10 +46,11 @@ func TestTransactions(t *testing.T) {
 		_, err = barColl.Core.InsertOne(sessCtx, bson.D{{"xyz", 999}}) ; if err != nil {
 			return
 		}
+		// 如果 return 的 err != nil, 则事务会 abort 取消
 		return
 	}) ; if err != nil {
 	    return
 	}
-	log.Printf("result: %v", result)
+	log.Printf("txResult: %v", txResult)
 
 }

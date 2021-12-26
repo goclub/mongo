@@ -1,0 +1,21 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+<h2>页面未翻译,跳转到原版对应文档</h2>
+<a href="" id="link"></a>
+<script>
+    var href = "https://docs.mongodb.com" + location.pathname + location.search + location.hash
+    setTimeout(function (){
+        location.href = href
+    }, 300)
+    link.href = href
+    link.innerHTML = href
+</script>
+</body>
+</html>

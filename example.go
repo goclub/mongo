@@ -5,7 +5,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"time"
 )
-
+// 演示用连接uri,正式项目请使用公司环境对于的uri,因为一般正式环境不会加 connect=direct
+const ExampleReplicaSetURI = "mongodb://goclub:goclub@localhost:27017/?authSource=goclub&connect=direct"
 type ExampleMovie struct {
 	ID primitive.ObjectID `bson:"_id,omitempty"`
 	Title     string   `bson:"title"`

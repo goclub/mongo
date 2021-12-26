@@ -1,2 +1,4 @@
 title: goclub/mongo
 remote_theme: 2type/gitbook
+plugins:
+  - "jekyll-github-metadata"

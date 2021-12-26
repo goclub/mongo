@@ -17,7 +17,7 @@ import (
 func TestProjection(t *testing.T) {
 	/* In a formal environment ignore defer code */var err error;defer func() { if err != nil { xerr.PrintStack(err) } }()
 	ctx := context.Background()
-	client, err := mongo.Connect(ctx, mongoOptions.Client().ApplyURI("mongodb://goclub:goclub@localhost:27017/goclub?authSource=goclub")) ; if err != nil {
+	client, err := mongo.Connect(ctx, mongoOptions.Client().ApplyURI(mo.ExampleReplicaSetURI)) ; if err != nil {
 		return
 	}
 	err = client.Ping(ctx, readpref.Primary()) ; if err != nil {

@@ -2,5 +2,26 @@
 <a id="mongoOfficialLink" target="_blank" href="#">官方原文</a>
 
 <script>
-    mongoOfficialLink.href = "https://docs.mongodb.com" + location.pathname
+    mongoOfficialLink.href = "https://docs.mongodb.com" + location.pathname + location.search + location.hash
+</script>
+
+
+<script>
+    window.GithubRepoURL = ""
+    window.GithubRepoURL = "{{ site.github.repository_url }}"
+    window.GithubBranch  = "main"
+    window.GithubBranch = "{{ site.github.source.branch }}"
+
+    window.onload = function (){
+        document.querySelectorAll('a').forEach(function (node) {
+            var embedReg = /\?blob$/g
+            if (!embedReg.test(node.href)) {
+                return
+            }
+            node.setAttribute('_target', "blank")
+            var sourcePath = node.href.replace(location.origin, '')
+            var onlineHref = GithubRepoURL + "/blob/" + GithubBranch  + sourcePath
+            node.href = onlineHref
+        })
+    }
 </script>

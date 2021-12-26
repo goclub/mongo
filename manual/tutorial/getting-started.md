@@ -20,7 +20,7 @@ permalink: /manual/tutorial/getting-started/
 > goclub/mongo 使用了 [Document](https://pkg.go.dev/github.com/goclub/mongo#Document) 和 [ManyDocument](https://pkg.go.dev/github.com/goclub/mongo#ManyDocument)
 > 作为一些方法的入参,定义一些满足 Document ManyDocument 接口的结构体能让减少很多重复的工作量.让代码更健壮
 
-[点击查看示例代码](./getting-started-insert_test.go)
+[点击查看示例代码](./getting-started-insert_test.go?blob)
 
 
 插入操作会返回包含每个成功插入的文档的 _id 的数组。 Collection.InsertMany 会自动将这些 _id 赋值给 mo.ManyExampleMovie,
@@ -43,7 +43,7 @@ func (many ManyExampleMovie) BeforeInsertMany(data BeforeInsertManyData) (err er
 要从集合中查询文档，可以使用  [Collection.Find](https://pkg.go.dev/github.com/goclub/mongo#Collection.Find)  方法。
 若要选择集合中的所有文档，请将一个空的 `bson.M{}` 作为查询筛选器文档传递给该方法。
 
-[点击查看示例代码](./getting-started-find_test.go)
+[点击查看示例代码](./getting-started-find_test.go?blob)
 
 ## 按条件查询数据
 
@@ -83,7 +83,7 @@ filter := bson.M{
 }
 ```
 
-[点击查看示例代码](./getting-started-filter-data_test.go)
+[点击查看示例代码](./getting-started-filter-data_test.go?blob)
 
 ## 指定返回字段
 
@@ -128,7 +128,7 @@ err = cursor.All(ctx, &list) ; if err != nil {
 }
 ```
 
-[点击查看示例代码](./getting-started-projection_test.go)
+[点击查看示例代码](./getting-started-projection_test.go?blob)
 
 ## 聚合
 
@@ -161,7 +161,7 @@ db.movies.aggregate( [
 - [`$sort`](/manual/reference/operator/aggregation/sort/#mongodb-pipeline-pipe.-sort) 排序
 
 
-[点击查看示例代码](./getting-started-aggregate_test.go)
+[点击查看示例代码](./getting-started-aggregate_test.go?blob)
 
 
 ## 其他例子

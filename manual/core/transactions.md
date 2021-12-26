@@ -17,7 +17,7 @@ permalink: /manual/core/transactions/
 
 这个示例使用 callback API处理事务,开启事务执行指定操作并提交事务(or abours on error).
 
-The new callback API incorporates retry logic for "[TransientTransactionError](/manual/core/transactions-in-applications/#std-label-transient-transaction-error)" or "[UnknownTransactionCommitResult](https://docs.mongodb.com/manual/core/transactions-in-applications/#std-label-unknown-transaction-commit-result)" commit errors.
+`session.WithTransaction` 在事务提交时出现 "[TransientTransactionError](/manual/core/transactions-in-applications/#std-label-transient-transaction-error)" 或 "[UnknownTransactionCommitResult](https://docs.mongodb.com/manual/core/transactions-in-applications/#std-label-unknown-transaction-commit-result)" 时会尝试重试.(译者:建议去看session.WithTransaction源码)
 
 > **重要** 
 > - Recommended. Use the MongoDB driver updated for the version of your MongoDB deployment. For transactions on MongoDB 4.2 deployments (replica sets and sharded clusters), clients must use MongoDB drivers updated for MongoDB 4.2. 

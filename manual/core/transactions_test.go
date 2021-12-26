@@ -36,7 +36,8 @@ func TestTransactions(t *testing.T) {
 	    return
 	}
 	defer session.EndSession(ctx)
-	result, err := session.WithTransaction(ctx, func(sessCtx mongo.SessionContext) (out interface{}, err error) {
+	// cbResult 最终会作为 WithTransaction 的出参 result
+	result, err := session.WithTransaction(ctx, func(sessCtx mongo.SessionContext) (cbResult interface{}, err error) {
 		ctx := 0;_=ctx // redefine ctx avert bug
 		_, err = fooColl.Core.InsertOne(sessCtx, bson.D{{"abc", 1}}) ; if err != nil {
 		    return

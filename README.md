@@ -20,3 +20,5 @@ mongo 手册中文版 + go 语言实现
 # 确保你安装了 jekyll
 bundle exec jekyll serve
 ```
+
+[migrate.go](./migrate.go?embed)

@@ -20,7 +20,7 @@ permalink: /manual/core/transactions/
 `session.WithTransaction` 在事务提交时出现 "[TransientTransactionError](/manual/core/transactions-in-applications/#std-label-transient-transaction-error)" 或 "[UnknownTransactionCommitResult](https://docs.mongodb.com/manual/core/transactions-in-applications/#std-label-unknown-transaction-commit-result)" 时会尝试重试.(译者:建议去看session.WithTransaction源码)
 
 > **重要** 
-> - Recommended. Use the MongoDB driver updated for the version of your MongoDB deployment. For transactions on MongoDB 4.2 deployments (replica sets and sharded clusters), clients must use MongoDB drivers updated for MongoDB 4.2. 
+> - (译者:[驱动API](/manual/core/transactions-in-applications/#driver-versions)) Recommended. Use the MongoDB driver updated for the version of your MongoDB deployment. For transactions on MongoDB 4.2 deployments (replica sets and sharded clusters), clients must use MongoDB drivers updated for MongoDB 4.2. 
 > - 当使用驱动程序时，事务中的每个操作都必须与会话关联(将`mongo.SessionContext`传递给每个操作函数)。
 > - 事务中操作使用 [transaction-level read concern - 事务级别读](#std-label-transactions-read-concern) [transaction-level write concern - 事务级别写](#std-label-transactions-write-concern) [transaction-level read preference - 读优先](#std-label-transactions-read-preference)
 > - 在MongoDB 4.2和更早的版本中，不能在事务中创建集合。如果在事务内部运行，导致文档插入的写操作(例如使用upsert: true进行插入或更新操作)必须针对现有的集合。

@@ -6,28 +6,7 @@
 </script>
 
 <script>
-    window.GithubRepoURL = ""
-    window.GithubRepoURL = "{{ site.github.repository_url }}"
-    window.GithubBranch  = "main"
-    window.GithubBranch = "{{ site.github.source.branch }}"
-    if (GithubBranch == "gh-pages") {
-        GithubBranch = "main"
-    }
-    window.PagePath = "{{page.path}}"
-    window.onload = function (){
-        document.querySelectorAll('a').forEach(function (node) {
-            var embedReg = /\?blob/g
-            if (!embedReg.test(node.href)) {
-                return
-            }
-            node.setAttribute('target', "_blank")
-            var sourcePath = node.href.replace(location.origin, '').replace(location.pathname, "").replace("?blob","?")
-            var onlineHref = GithubRepoURL + "/blob/" + GithubBranch  + "/"+ PagePath.replace(/\/[^/]*$/, "/") + sourcePath
-            node.href = onlineHref
-            var githubIcon = document.createElement("span")
-            githubIcon.className = "fa fa-github"
-            githubIcon.style = "margin-right:.3em;"
-            node.prepend(githubIcon)
-        })
+    if (location.pathname == '/mongo') {
+        location.href = "https://mongo.goclub.run/"
     }
 </script>

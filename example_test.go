@@ -39,10 +39,10 @@ func init () {
 func ExampleNewDatabase() {
 	ctx := context.Background()
 	client, err := mongo.Connect(ctx, mongoOptions.Client().ApplyURI("mongodb://goclub:goclub@localhost:27017/goclub?authSource=goclub")) ; if err != nil {
-		return
+		panic(err)
 	}
 	err = client.Ping(ctx, readpref.Primary()) ; if err != nil {
-		return
+		panic(err)
 	}
 	db = mo.NewDatabase(client, "goclub")
 }

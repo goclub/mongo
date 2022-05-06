@@ -30,6 +30,7 @@ type ResultInsertOne struct {
 }
 
 func (res ResultInsertOne) InsertedObjectID() primitive.ObjectID {
+	log.Printf("---------- %T %+v", res.InsertedID, res.InsertedID)
 	return res.InsertedID.(primitive.ObjectID)
 }
 func (c *Collection) InsertOne(ctx context.Context, document Document, cmd InsertOneCommand) (result ResultInsertOne, err error) {

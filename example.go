@@ -7,10 +7,11 @@ import (
 )
 
 // 演示用连接uri,正式项目请使用公司环境对于的uri,因为示例的副本集环境是docker所以需要使用connect=direct
-const ExampleReplicaSetURI = "mongodb://goclub:goclub@localhost:27017/?authSource=goclub&connect=direct"
+const ExampleReplicaSetURI = "mongodb://goclub:goclub@localhost:27017/?authSource=goclub&readPreference=primary&directConnection=true&ssl=false"
 
 // IDExampleMovie 使用ID类型避免出错
-type IDExampleMovie struct{ primitive.ObjectID }
+type IDExampleMovie struct{ AliasObjectID }
+
 type ExampleMovie struct {
 	ID          IDExampleMovie     `bson:"_id,omitempty"`
 	Title       string             `bson:"title"`
@@ -59,8 +60,9 @@ func (many ManyExampleMovie) BeforeInsertMany(data BeforeInsertManyData) (err er
 	return
 }
 
+type IDExampleCommit struct { AliasObjectID }
 type ExampleComment struct {
-	ID         primitive.ObjectID `bson:"_id,omitempty"`
+	ID         IDExampleCommit    `bson:"_id,omitempty"`
 	UserID     uint64             `bson:"userID"`
 	NewsID     primitive.ObjectID `bson:"newsID"`
 	Message    string             `bson:"message"`
@@ -87,7 +89,7 @@ func (d ExampleComment) Field() (f struct {
 
 func (v *ExampleComment) BeforeInsert(data BeforeInsertData) (err error) {
 	if v.ID.IsZero() {
-		v.ID = data.ObjectID
+		v.ID.ObjectID = data.ObjectID
 	}
 	return
 }
@@ -109,7 +111,7 @@ func (many ManyExampleComment) ManyD() (documents []interface{}, err error) {
 func (many ManyExampleComment) BeforeInsertMany(data BeforeInsertManyData) (err error) {
 	IDs := data.ObjectIDs()
 	for i, _ := range many {
-		many[i].ID = IDs[i]
+		many[i].ID.ObjectID = IDs[i]
 	}
 	return
 }

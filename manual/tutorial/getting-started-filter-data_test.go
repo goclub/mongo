@@ -32,11 +32,8 @@ func TestFilterData(t *testing.T) {
 				"$lt": time.Date(2000,1,1,0,0,0,0, time.UTC), // 中国时区用 time.FixedZone("CST", 8*3600) 代替 time.UTC
 			},
 		}
-		cursor, err := moviesColl.Find(ctx, filter, mo.FindCommand{}) ; if err != nil {
-			return
-		}
 		list := mo.ManyExampleMovie{}
-		err = cursor.All(ctx, &list) ; if err != nil {
+		err = moviesColl.Find(ctx, filter, mo.FindCommand{}, &list) ; if err != nil {
 			return
 		}
 		log.Print("len($lt)", len(list))
@@ -52,13 +49,10 @@ func TestFilterData(t *testing.T) {
 				"$gt": 100,
 			},
 		}
-		cursor, err := moviesColl.Find(ctx, filter, mo.FindCommand{}) ; if err != nil {
-		return
-	}
 		list := mo.ManyExampleMovie{}
-		err = cursor.All(ctx, &list) ; if err != nil {
-		return
-	}
+		err = moviesColl.Find(ctx, filter, mo.FindCommand{}, &list) ; if err != nil {
+			return
+		}
 		log.Print("len($gt)", len(list))
 		jsonb, err := json.MarshalIndent(list, "", "  ") ; if err != nil {
 		return
@@ -72,11 +66,8 @@ func TestFilterData(t *testing.T) {
 				"$in": []string{"Japanese", "Mandarin"},
 			},
 		}
-		cursor, err := moviesColl.Find(ctx, filter, mo.FindCommand{}) ; if err != nil {
-		return
-	}
 		list := mo.ManyExampleMovie{}
-		err = cursor.All(ctx, &list) ; if err != nil {
+		err = moviesColl.Find(ctx, filter, mo.FindCommand{}, &list) ; if err != nil {
 		return
 	}
 		log.Print("len($in)", len(list))

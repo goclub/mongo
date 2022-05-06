@@ -28,15 +28,6 @@ func TestProjection(t *testing.T) {
 	// 正文开始
 	{
 		filter := bson.M{}
-		cursor, err := moviesColl.Find(ctx, filter, mo.FindCommand{
-			Projection: bson.M{
-				"title": 1,
-				"directors": 1,
-				"year": 1,
-			},
-		}) ; if err != nil {
-			return
-		}
 		type partMovies struct {
 			ID primitive.ObjectID `bson:"_id"`
 			Title string `bson:"title"`
@@ -44,9 +35,15 @@ func TestProjection(t *testing.T) {
 			Year int `bson:"year"`
 		}
 		list := []partMovies{}
-		err = cursor.All(ctx, &list) ; if err != nil {
-		return
-	}
+		err = moviesColl.Find(ctx, filter, mo.FindCommand{
+			Projection: bson.M{
+				"title": 1,
+				"directors": 1,
+				"year": 1,
+			},
+		}, &list) ; if err != nil {
+			return
+		}
 		log.Print("len(title:1,directors:1,year:1)", len(list))
 		jsonb, err := json.MarshalIndent(list, "", "  ") ; if err != nil {
 		return
@@ -55,21 +52,18 @@ func TestProjection(t *testing.T) {
 	}
 	{
 		filter := bson.M{}
-		cursor, err := moviesColl.Find(ctx, filter, mo.FindCommand{
-			Projection: bson.M{
-				"_id": 0,
-				"title": 1,
-				"genres": 1,
-			},
-		}) ; if err != nil {
-		return
-	}
 		type partMovies struct {
 			Title string `bson:"title"`
 			Genres []string `bson:"genres"`
 		}
 		list := []partMovies{}
-		err = cursor.All(ctx, &list) ; if err != nil {
+		err = moviesColl.Find(ctx, filter, mo.FindCommand{
+			Projection: bson.M{
+				"_id": 0,
+				"title": 1,
+				"genres": 1,
+			},
+		}, &list) ; if err != nil {
 		return
 	}
 		log.Print("len(_id:0,title:1,genres:1)", len(list))

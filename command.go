@@ -12,12 +12,14 @@ type InsertOneCommand struct {
 	// validation.
 	ByPassDocumentValidation xtype.OptionBool
 }
-func (c InsertOneCommand) Options ()(opt []*options.InsertOneOptions) {
+
+func (c InsertOneCommand) Options() (opt []*options.InsertOneOptions) {
 	if c.ByPassDocumentValidation.Valid() {
 		opt = append(opt, options.InsertOne().SetBypassDocumentValidation(c.ByPassDocumentValidation.Unwrap()))
 	}
 	return
 }
+
 type InsertManyCommand struct {
 	// If true, writes executed as part of the operation will opt out of document-level validation on the server. This
 	// option is valid for MongoDB versions >= 3.2 and is ignored for previous server versions. The default value is
@@ -28,7 +30,8 @@ type InsertManyCommand struct {
 	// If true, no writes will be executed after one fails. The default value is true.
 	Ordered xtype.OptionBool
 }
-func (c InsertManyCommand) Options ()(opt []*options.InsertManyOptions) {
+
+func (c InsertManyCommand) Options() (opt []*options.InsertManyOptions) {
 	if c.ByPassDocumentValidation.Valid() {
 		opt = append(opt, options.InsertMany().SetBypassDocumentValidation(c.ByPassDocumentValidation.Unwrap()))
 	}
@@ -37,6 +40,7 @@ func (c InsertManyCommand) Options ()(opt []*options.InsertManyOptions) {
 	}
 	return
 }
+
 type FindOneCommand struct {
 	// If true, an operation on a sharded cluster can return partial results if some shards are down rather than
 	// returning an error. The default value is false.
@@ -87,7 +91,8 @@ type FindOneCommand struct {
 	// returned. The driver will return an error if the sort parameter is a multi-key map.
 	Skip xtype.OptionInt64
 }
-func (c FindOneCommand) Options ()(opt []*options.FindOneOptions) {
+
+func (c FindOneCommand) Options() (opt []*options.FindOneOptions) {
 	if c.Sort != nil {
 		opt = append(opt, options.FindOne().SetSort(c.Sort))
 	}
@@ -126,6 +131,7 @@ func (c FindOneCommand) Options ()(opt []*options.FindOneOptions) {
 	}
 	return
 }
+
 type FindCommand struct {
 	// If true, the server can write temporary data to disk while executing the find operation. This option is only
 	// valid for MongoDB versions >= 4.4. Server versions >= 3.2 will report an error if this option is specified. For
@@ -135,7 +141,7 @@ type FindCommand struct {
 
 	// If true, an operation on a sharded cluster can return partial results if some shards are down rather than
 	// returning an error. The default value is false.
-	AllowPartialResults  xtype.OptionBool
+	AllowPartialResults xtype.OptionBool
 
 	// The maximum number of documents to be included in each batch returned by the server.
 	BatchSize xtype.OptionInt32
@@ -161,7 +167,7 @@ type FindCommand struct {
 	// The maximum number of documents to return. The default value is 0, which means that all documents matching the
 	// filter will be returned. A negative limit specifies that the resulting documents should be returned in a single
 	// batch. The default value is 0.
-	Limit xtype.OptionInt64
+	Limit xtype.OptionUint64
 
 	// A document specifying the exclusive upper bound for a specific index. The default value is nil, which means that
 	// there is no maximum value.
@@ -203,7 +209,7 @@ type FindCommand struct {
 	ShowRecordID xtype.OptionBool
 
 	// The number of documents to skip before adding documents to the result. The default value is 0.
-	Skip xtype.OptionInt64
+	Skip xtype.OptionUint64
 
 	// If true, the cursor will not return a document more than once because of an intervening write operation. The
 	// default value is false.
@@ -215,7 +221,8 @@ type FindCommand struct {
 	// sort parameter is a multi-key map.
 	Sort interface{}
 }
-func (c FindCommand) Options ()(opt []*options.FindOptions) {
+
+func (c FindCommand) Options() (opt []*options.FindOptions) {
 	if c.AllowDiskUse.Valid() {
 		opt = append(opt, options.Find().SetAllowDiskUse(c.AllowDiskUse.Unwrap()))
 	}
@@ -238,7 +245,7 @@ func (c FindCommand) Options ()(opt []*options.FindOptions) {
 		opt = append(opt, options.Find().SetHint(c.Hint))
 	}
 	if c.Limit.Valid() {
-		opt = append(opt, options.Find().SetLimit(c.Limit.Unwrap()))
+		opt = append(opt, options.Find().SetLimit(int64(c.Limit.Unwrap())))
 	}
 	if c.Max != nil {
 		opt = append(opt, options.Find().SetMax(c.Max))
@@ -266,7 +273,7 @@ func (c FindCommand) Options ()(opt []*options.FindOptions) {
 		opt = append(opt, options.Find().SetShowRecordID(c.ShowRecordID.Unwrap()))
 	}
 	if c.Skip.Valid() {
-		opt = append(opt, options.Find().SetSkip(c.Skip.Unwrap()))
+		opt = append(opt, options.Find().SetSkip(int64(c.Skip.Unwrap())))
 	}
 	// deprecated Snapshot
 	if c.Sort != nil {
@@ -274,6 +281,7 @@ func (c FindCommand) Options ()(opt []*options.FindOptions) {
 	}
 	return
 }
+
 type UpdateCommand struct {
 	// A set of filters specifying to which array elements an update should apply. This option is only valid for MongoDB
 	// versions >= 3.6. For previous server versions, the driver will return an error if this option is used. The
@@ -303,7 +311,8 @@ type UpdateCommand struct {
 	// default value is false.
 	Upsert xtype.OptionBool
 }
-func (c UpdateCommand) Options ()(opt []*options.UpdateOptions) {
+
+func (c UpdateCommand) Options() (opt []*options.UpdateOptions) {
 	if c.ArrayFilters != nil {
 		opt = append(opt, options.Update().SetArrayFilters(*c.ArrayFilters))
 	}
@@ -365,7 +374,7 @@ type AggregateCommand struct {
 	Let interface{}
 }
 
-func (c AggregateCommand) Options ()(opt []*options.AggregateOptions) {
+func (c AggregateCommand) Options() (opt []*options.AggregateOptions) {
 	if c.AllowDiskUse.Valid() {
 		opt = append(opt, options.Aggregate().SetAllowDiskUse(c.AllowDiskUse.Unwrap()))
 	}
@@ -392,6 +401,74 @@ func (c AggregateCommand) Options ()(opt []*options.AggregateOptions) {
 	}
 	if c.Let != nil {
 		opt = append(opt, options.Aggregate().SetLet(c.Let))
+	}
+	return
+}
+
+// DeleteCommand represents options that can be used to configure DeleteOne and DeleteMany operations.
+type DeleteCommand struct {
+	// Specifies a collation to use for string comparisons during the operation. This option is only valid for MongoDB
+	// versions >= 3.4. For previous server versions, the driver will return an error if this option is used. The
+	// default value is nil, which means the default collation of the collection will be used.
+	Collation *options.Collation
+
+	// The index to use for the operation. This should either be the index name as a string or the index specification
+	// as a document. This option is only valid for MongoDB versions >= 4.4. Server versions >= 3.4 will return an error
+	// if this option is specified. For server versions < 3.4, the driver will return a client-side error if this option
+	// is specified. The driver will return an error if this option is specified during an unacknowledged write
+	// operation. The driver will return an error if the hint parameter is a multi-key map. The default value is nil,
+	// which means that no hint will be sent.
+	Hint interface{}
+}
+
+func (c DeleteCommand) Options() (opt []*options.DeleteOptions) {
+	if c.Collation != nil {
+		opt = append(opt, options.Delete().SetCollation(c.Collation))
+	}
+	if c.Hint != nil {
+		opt = append(opt, options.Delete().SetHint(c.Hint))
+	}
+	return
+}
+
+// CountCommand represents options that can be used to configure a CountDocuments operation.
+type CountCommand struct {
+	// Specifies a collation to use for string comparisons during the operation. This option is only valid for MongoDB
+	// versions >= 3.4. For previous server versions, the driver will return an error if this option is used. The
+	// default value is nil, which means the default collation of the collection will be used.
+	Collation *options.Collation
+
+	// The index to use for the aggregation. This should either be the index name as a string or the index specification
+	// as a document. The driver will return an error if the hint parameter is a multi-key map. The default value is nil,
+	// which means that no hint will be sent.
+	Hint interface{}
+
+	// The maximum number of documents to count. The default value is 0, which means that there is no limit and all
+	// documents matching the filter will be counted.
+	Limit xtype.OptionUint64
+
+	// The maximum amount of time that the query can run on the server. The default value is nil, meaning that there is
+	// no time limit for query execution.
+	MaxTime xtype.OptionDuration
+
+	// The number of documents to skip before counting. The default value is 0.
+	Skip xtype.OptionUint64
+}
+func (c CountCommand) Options() (opt []*options.CountOptions) {
+	if c.Collation != nil {
+		opt = append(opt, options.Count().SetCollation(c.Collation))
+	}
+	if c.Hint != nil {
+		opt = append(opt, options.Count().SetHint(c.Hint))
+	}
+	if c.Limit.Valid() {
+		opt = append(opt, options.Count().SetLimit(int64(c.Limit.Unwrap())))
+	}
+	if c.MaxTime.Valid() {
+		opt = append(opt, options.Count().SetMaxTime(c.MaxTime.Unwrap()))
+	}
+	if c.Skip.Valid() {
+		opt = append(opt, options.Count().SetSkip(int64(c.Skip.Unwrap())))
 	}
 	return
 }

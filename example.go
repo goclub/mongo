@@ -28,9 +28,11 @@ type ExampleMovieAwards struct {
 	Text        string `bson:"text"`
 }
 
-func (v *ExampleMovie) AfterInsert(data AfterInsertData) (err error) {
+func (v *ExampleMovie) AfterInsert(result ResultInsertOne) (err error) {
 	if v.ID.IsZero() {
-		v.ID = data.ObjectID
+		v.ID, err = result.InsertedObjectID() ; if err != nil {
+			return
+		}
 	}
 	return
 }
@@ -49,10 +51,12 @@ func (many ManyExampleMovie) ManyD() (documents []interface{}, err error) {
 	return
 }
 
-func (many ManyExampleMovie) AfterInsertMany(data AfterInsertManyData) (err error) {
-	IDs := data.ObjectIDs()
+func (many ManyExampleMovie) AfterInsertMany(result ResultInsertMany) (err error) {
+	objectIDs, err := result.InsertedObjectIDs() ; if err != nil {
+		return
+	}
 	for i, _ := range many {
-		many[i].ID = IDs[i]
+		many[i].ID = objectIDs[i]
 	}
 	return
 }
@@ -81,9 +85,11 @@ func (d ExampleComment) Field() (f struct {
 	return
 }
 
-func (v *ExampleComment) AfterInsert(data AfterInsertData) (err error) {
+func (v *ExampleComment) AfterInsert(result ResultInsertOne) (err error) {
 	if v.ID.IsZero() {
-		v.ID = data.ObjectID
+		v.ID, err = result.InsertedObjectID() ; if err != nil {
+			return
+		}
 	}
 	return
 }
@@ -102,10 +108,12 @@ func (many ManyExampleComment) ManyD() (documents []interface{}, err error) {
 	return
 }
 
-func (many ManyExampleComment) AfterInsertMany(data AfterInsertManyData) (err error) {
-	IDs := data.ObjectIDs()
+func (many ManyExampleComment) AfterInsertMany(result ResultInsertMany) (err error) {
+	objectIDs, err := result.InsertedObjectIDs() ; if err != nil {
+		return
+	}
 	for i, _ := range many {
-		many[i].ID = IDs[i]
+		many[i].ID = objectIDs[i]
 	}
 	return
 }
@@ -119,9 +127,11 @@ type ExampleNewsStatDaily struct {
 	PlatformUV map[string]uint64  `bson:"platformUV"`
 }
 
-func (v *ExampleNewsStatDaily) AfterInsert(data AfterInsertData) (err error) {
+func (v *ExampleNewsStatDaily) AfterInsert(result ResultInsertOne) (err error) {
 	if v.ID.IsZero() {
-		v.ID = data.ObjectID
+		v.ID, err = result.InsertedObjectID() ; if err != nil {
+			return
+		}
 	}
 	return
 }
@@ -157,10 +167,12 @@ func (many ManyExampleNewsStatDaily) ManyD() (documents []interface{}, err error
 	return
 }
 
-func (many ManyExampleNewsStatDaily) AfterInsertMany(data AfterInsertManyData) (err error) {
-	IDs := data.ObjectIDs()
+func (many ManyExampleNewsStatDaily) AfterInsertMany(result ResultInsertMany) (err error) {
+	objectIDs, err := result.InsertedObjectIDs() ; if err != nil {
+		return
+	}
 	for i, _ := range many {
-		many[i].ID = IDs[i]
+		many[i].ID = objectIDs[i]
 	}
 	return
 }
@@ -170,9 +182,11 @@ type ExampleLocation struct {
 	Location Point              `bson:"location"`
 }
 
-func (v *ExampleLocation) AfterInsert(data AfterInsertData) (err error) {
+func (v *ExampleLocation) AfterInsert(result ResultInsertOne) (err error) {
 	if v.ID.IsZero() {
-		v.ID = data.ObjectID
+		v.ID, err = result.InsertedObjectID() ; if err != nil {
+			return
+		}
 	}
 	return
 }
@@ -200,10 +214,12 @@ func (many ManyExampleLocation) ManyD() (documents []interface{}, err error) {
 	return
 }
 
-func (many ManyExampleLocation) AfterInsertMany(data AfterInsertManyData) (err error) {
-	IDs := data.ObjectIDs()
+func (many ManyExampleLocation) AfterInsertMany(result ResultInsertMany) (err error) {
+	objectIDs, err := result.InsertedObjectIDs() ; if err != nil {
+		return
+	}
 	for i, _ := range many {
-		many[i].ID = IDs[i]
+		many[i].ID = objectIDs[i]
 	}
 	return
 }

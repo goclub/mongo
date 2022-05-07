@@ -32,7 +32,7 @@ func Migrate(db *Database, ptr interface{}) {
 	}
 	for _, methodName := range methodNames {
 		document := Action{}
-		has, err := coll.FindOne(context.TODO(), bson.D{{"name", methodName}}, &document, FindOneCommand{}) ; if err != nil {
+		has, err := coll.FindOne(context.TODO(), Filter{bson.M{"name": methodName}}, &document, FindOneCommand{}) ; if err != nil {
 		    return
 		}
 		// Migrations are all manually triggered, with no concurrency concerns
@@ -64,7 +64,11 @@ type Action struct {
 	DefaultLifeCycle
 }
 
-func (v *Action) AfterInsert(data AfterInsertData) (err error) {
-	if v.ID.IsZero() { v.ID = data.ObjectID }
+func (v *Action) AfterInsert(result ResultInsertOne) (err error) {
+	if v.ID.IsZero() {
+		v.ID, err = result.InsertedObjectID() ; if err != nil {
+			return
+		}
+	}
 	return
 }

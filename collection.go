@@ -52,12 +52,7 @@ func (c *Collection) InsertOne(ctx context.Context, document Document, cmd Inser
 	}
 	result.InsertOneResult = coreRes
 
-	insertedObjectID, err :=  result.InsertedObjectID() ; if err != nil {
-	    return
-	}
-	err = document.AfterInsert(AfterInsertData{
-		ObjectID: insertedObjectID,
-	})
+	err = document.AfterInsert(result)
 	if err != nil {
 		return
 	}
@@ -68,9 +63,15 @@ type ResultInsertMany struct {
 	*mongo.InsertManyResult
 }
 
-func (res ResultInsertMany) InsertedObjectIDs() (insertedObjectIDs []primitive.ObjectID) {
-	for _, id := range res.InsertedIDs {
-		insertedObjectIDs = append(insertedObjectIDs, id.(primitive.ObjectID))
+func (res ResultInsertMany) InsertedObjectIDs() (insertedObjectIDs []primitive.ObjectID, err error) {
+	for _, v := range res.InsertedIDs {
+		switch id := v.(type) {
+		case primitive.ObjectID:
+		insertedObjectIDs = append(insertedObjectIDs, id)
+		default:
+			err = xerr.New("goclub/mongo: ResultInsertMany{}.InsertedObjectIDs() id is not primitive.ObjectID")
+			return
+		}
 	}
 	return
 }
@@ -90,9 +91,7 @@ func (c *Collection) InsertMany(ctx context.Context, documents ManyDocument, cmd
 		return
 	}
 	result.InsertManyResult = coreRes
-	err = documents.AfterInsertMany(AfterInsertManyData{
-		ObjectIDs: result.InsertedObjectIDs,
-	})
+	err = documents.AfterInsertMany(result)
 	if err != nil {
 		return
 	}

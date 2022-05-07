@@ -426,10 +426,9 @@ func ExamplePaging() {
 	}()
 	ctx := context.Background()
 	field := mo.ExampleComment{}.Field()
-	deleteFilter := bson.M{
+	delResult, err := commentColl.DeleteMany(ctx, mo.Filter{bson.M{
 		field.Message: "paging",
-	}
-	delResult, err := commentColl.DeleteMany(ctx, deleteFilter, mo.DeleteCommand{})
+	}}, mo.DeleteCommand{})
 	if err != nil {
 		return
 	}

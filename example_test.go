@@ -186,19 +186,20 @@ func ExampleUpdateCommand_Options_Upsert_InsertIgnore() {
 					xerr.PrintStack(err)
 				}
 			}()
-			result, err := newsStatDailyColl.UpdateOne(ctx, mo.Filter{bson.D{
-				{field.Date, "2008-08-08"},
-				{field.NewsID, newsID},
-			}}, mo.Update{bson.D{
-				{
+			result, err := newsStatDailyColl.UpdateOne(ctx,mo.FilterUpdate{
+				Filter: bson.D{
+					{field.Date, "2008-08-08"},
+					{field.NewsID, newsID},
+				},
+				Update: bson.D{{
 					// You can also change it to $set
 					// Upsert is the key
 					"$inc", bson.D{
-					{field.UV, 1},
-					{field.PV, 1},
-				},
-				},
-			}}, mo.UpdateCommand{
+						{field.UV, 1},
+						{field.PV, 1},
+					},
+				}},
+			}, mo.UpdateCommand{
 				// If true, a new document will be inserted if the filter does not match any documents in the collection. The
 				// default value is false.
 				Upsert: xtype.Bool(true),
@@ -224,7 +225,7 @@ func ExampleCollection_Find() {
 		}
 	}()
 	ctx := context.Background()
-	// FindByObjectID
+	// FindOneByObjectID
 	{
 		ExampleComment := mo.ExampleComment{
 			UserID:     1,
@@ -237,10 +238,10 @@ func ExampleCollection_Find() {
 		}
 		findExampleComment := mo.ExampleComment{}
 		// ExampleComment.AliasObjectID = primitive.NewObjectID() // if unExampleComment this line of code, hasExampleComment will be false
-		hasExampleComment, err := commentColl.FindByObjectID(ctx, ExampleComment.ID, &findExampleComment, mo.FindOneCommand{}) ; if err != nil {
+		hasExampleComment, err := commentColl.FindOneByObjectID(ctx, ExampleComment.ID, &findExampleComment, mo.FindOneCommand{}) ; if err != nil {
 			return
 		}
-		log.Print("ExampleCollection_Find FindByObjectID: ", findExampleComment, hasExampleComment)
+		log.Print("ExampleCollection_Find FindOneByObjectID: ", findExampleComment, hasExampleComment)
 	}
 	// FindOne
 	{
@@ -254,9 +255,9 @@ func ExampleCollection_Find() {
 		}
 		exampleComment := mo.ExampleComment{}
 		field := exampleComment.Field()
-		has, err := commentColl.FindOne(ctx, mo.Filter{bson.D{
+		has, err := commentColl.FindOne(ctx, bson.D{
 			{field.UserID, 2},
-		}}, &exampleComment, mo.FindOneCommand{})
+		}, &exampleComment, mo.FindOneCommand{})
 		if err != nil {
 			return
 		}
@@ -398,7 +399,7 @@ func ExamplePointGeoJSON() {
 			},
 		},
 	}
-	err = locationCool.Find(ctx, mo.Filter{filter}, mo.FindCommand{Limit: xtype.Uint64(100)}, &targetList) ; if err != nil {
+	err = locationCool.Find(ctx, filter, mo.FindCommand{Limit: xtype.Uint64(100)}, &targetList) ; if err != nil {
 		return
 	}
 	log.Print("len(targetList)", len(targetList))
@@ -426,9 +427,9 @@ func ExamplePaging() {
 	}()
 	ctx := context.Background()
 	field := mo.ExampleComment{}.Field()
-	delResult, err := commentColl.DeleteMany(ctx, mo.Filter{bson.M{
+	delResult, err := commentColl.DeleteMany(ctx, bson.M{
 		field.Message: "paging",
-	}}, mo.DeleteCommand{})
+	}, mo.DeleteCommand{})
 	if err != nil {
 		return
 	}
@@ -448,9 +449,9 @@ func ExamplePaging() {
 	}
 	var pagingList mo.ManyExampleComment
 	total, err := commentColl.Paging(ctx, mo.Paging{
-		Filter:    mo.Filter{bson.M{
+		Filter:    bson.M{
 			field.Message: "paging",
-		}},
+		},
 		FindCmd:   mo.FindCommand{},
 		ResultPtr: &pagingList,
 		CountCmd:  mo.CountCommand{},

@@ -10,7 +10,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 )
-
 type Collection struct {
 	db   *Database
 	Core *mongo.Collection
@@ -29,9 +28,14 @@ type ResultInsertOne struct {
 	*mongo.InsertOneResult
 }
 
-func (res ResultInsertOne) InsertedObjectID() primitive.ObjectID {
-	log.Printf("---------- %T %+v", res.InsertedID, res.InsertedID)
-	return res.InsertedID.(primitive.ObjectID)
+func (res ResultInsertOne) InsertedObjectID() (objectID primitive.ObjectID, err error) {
+	switch id := res.InsertedID.(type) {
+	case primitive.ObjectID:
+		return id, nil
+	default:
+		err = xerr.New("goclub/mongo: ResultInsertOne{}.InsertedObjectID() id is not primitive.ObjectID")
+		return
+	}
 }
 func (c *Collection) InsertOne(ctx context.Context, document Document, cmd InsertOneCommand) (result ResultInsertOne, err error) {
 	defer func() {
@@ -39,13 +43,20 @@ func (c *Collection) InsertOne(ctx context.Context, document Document, cmd Inser
 			err = xerr.WithStack(err)
 		}
 	}()
+	err = document.BeforeUpdate() ; if err != nil {
+	    return
+	}
 	coreRes, err := c.Core.InsertOne(ctx, document, cmd.Options()...)
 	if err != nil {
 		return
 	}
 	result.InsertOneResult = coreRes
-	err = document.BeforeInsert(BeforeInsertData{
-		ObjectID: result.InsertedObjectID(),
+
+	insertedObjectID, err :=  result.InsertedObjectID() ; if err != nil {
+	    return
+	}
+	err = document.AfterInsert(AfterInsertData{
+		ObjectID: insertedObjectID,
 	})
 	if err != nil {
 		return
@@ -79,7 +90,7 @@ func (c *Collection) InsertMany(ctx context.Context, documents ManyDocument, cmd
 		return
 	}
 	result.InsertManyResult = coreRes
-	err = documents.BeforeInsertMany(BeforeInsertManyData{
+	err = documents.AfterInsertMany(AfterInsertManyData{
 		ObjectIDs: result.InsertedObjectIDs,
 	})
 	if err != nil {

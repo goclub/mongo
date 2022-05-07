@@ -61,9 +61,10 @@ type Action struct {
 	ID primitive.ObjectID `bson:"_id,omitempty"`
 	Name string `bson:"name"`
 	Time time.Time `bson:"time"`
+	DefaultLifeCycle
 }
 
-func (v *Action) BeforeInsert(data BeforeInsertData) (err error) {
+func (v *Action) AfterInsert(data AfterInsertData) (err error) {
 	if v.ID.IsZero() { v.ID = data.ObjectID }
 	return
 }

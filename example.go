@@ -28,7 +28,7 @@ type ExampleMovieAwards struct {
 	Text        string `bson:"text"`
 }
 
-func (v *ExampleMovie) BeforeInsert(data BeforeInsertData) (err error) {
+func (v *ExampleMovie) AfterInsert(data AfterInsertData) (err error) {
 	if v.ID.IsZero() {
 		v.ID = data.ObjectID
 	}
@@ -49,7 +49,7 @@ func (many ManyExampleMovie) ManyD() (documents []interface{}, err error) {
 	return
 }
 
-func (many ManyExampleMovie) BeforeInsertMany(data BeforeInsertManyData) (err error) {
+func (many ManyExampleMovie) AfterInsertMany(data AfterInsertManyData) (err error) {
 	IDs := data.ObjectIDs()
 	for i, _ := range many {
 		many[i].ID = IDs[i]
@@ -63,6 +63,7 @@ type ExampleComment struct {
 	NewsID     primitive.ObjectID `bson:"newsID"`
 	Message    string             `bson:"message"`
 	Like       uint64             `bson:"like"`
+	DefaultLifeCycle
 }
 
 func (d ExampleComment) Field() (f struct {
@@ -80,7 +81,7 @@ func (d ExampleComment) Field() (f struct {
 	return
 }
 
-func (v *ExampleComment) BeforeInsert(data BeforeInsertData) (err error) {
+func (v *ExampleComment) AfterInsert(data AfterInsertData) (err error) {
 	if v.ID.IsZero() {
 		v.ID = data.ObjectID
 	}
@@ -101,7 +102,7 @@ func (many ManyExampleComment) ManyD() (documents []interface{}, err error) {
 	return
 }
 
-func (many ManyExampleComment) BeforeInsertMany(data BeforeInsertManyData) (err error) {
+func (many ManyExampleComment) AfterInsertMany(data AfterInsertManyData) (err error) {
 	IDs := data.ObjectIDs()
 	for i, _ := range many {
 		many[i].ID = IDs[i]
@@ -118,7 +119,7 @@ type ExampleNewsStatDaily struct {
 	PlatformUV map[string]uint64  `bson:"platformUV"`
 }
 
-func (v *ExampleNewsStatDaily) BeforeInsert(data BeforeInsertData) (err error) {
+func (v *ExampleNewsStatDaily) AfterInsert(data AfterInsertData) (err error) {
 	if v.ID.IsZero() {
 		v.ID = data.ObjectID
 	}
@@ -156,7 +157,7 @@ func (many ManyExampleNewsStatDaily) ManyD() (documents []interface{}, err error
 	return
 }
 
-func (many ManyExampleNewsStatDaily) BeforeInsertMany(data BeforeInsertManyData) (err error) {
+func (many ManyExampleNewsStatDaily) AfterInsertMany(data AfterInsertManyData) (err error) {
 	IDs := data.ObjectIDs()
 	for i, _ := range many {
 		many[i].ID = IDs[i]
@@ -169,7 +170,7 @@ type ExampleLocation struct {
 	Location Point              `bson:"location"`
 }
 
-func (v *ExampleLocation) BeforeInsert(data BeforeInsertData) (err error) {
+func (v *ExampleLocation) AfterInsert(data AfterInsertData) (err error) {
 	if v.ID.IsZero() {
 		v.ID = data.ObjectID
 	}
@@ -199,7 +200,7 @@ func (many ManyExampleLocation) ManyD() (documents []interface{}, err error) {
 	return
 }
 
-func (many ManyExampleLocation) BeforeInsertMany(data BeforeInsertManyData) (err error) {
+func (many ManyExampleLocation) AfterInsertMany(data AfterInsertManyData) (err error) {
 	IDs := data.ObjectIDs()
 	for i, _ := range many {
 		many[i].ID = IDs[i]

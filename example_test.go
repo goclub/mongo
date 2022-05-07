@@ -116,22 +116,28 @@ func ExampleMigrate() {
 func (suite TestExampleSuite) TestCollection_InsertOne() {
 	ExampleCollection_InsertOne()
 }
-func ExampleCollection_InsertOne() {
-	/* In a formal environment ignore defer code */ var err error
-	defer func() { if err != nil { xerr.PrintStack(err) } }()
-	ctx := context.Background()
-	// auto set id
-	exampleComment := mo.ExampleComment{
-		UserID:     1,
-		NewsID:     primitive.NewObjectID(),
-		Message:    "goclub/mongo",
-	}
-	_, err = commentColl.InsertOne(ctx, &exampleComment, mo.InsertOneCommand{})
-	if err != nil {
-		return
-	}
-	log.Printf("ExampleCollection_InsertOne: %+v", exampleComment)
+func TestExampleCollection_InsertOne (t *testing.T) {
+	ExampleCollection_InsertOne()
 }
+func ExampleCollection_InsertOne()  {
+    ctx := context.Background()
+	err := func() (err error){
+		exampleComment := mo.ExampleComment{
+			UserID:     1,
+			NewsID:     primitive.NewObjectID(),
+			Message:    "goclub/mongo",
+		}
+		_, err = commentColl.InsertOne(ctx, &exampleComment, mo.InsertOneCommand{})
+		if err != nil {
+			return
+		}
+		log.Printf("ExampleCollection_InsertOne: %+v", exampleComment)
+		return
+	}() ; if err != nil {
+	    log.Printf("%+v",err)
+	}
+}
+
 
 func (suite TestExampleSuite) TestCollection_InsertMany() {
 	ExampleCollection_InsertMany()
@@ -207,56 +213,56 @@ func ExampleUpdateCommand_Options_Upsert_InsertIgnore() {
 	wg.Wait()
 }
 
-// func (suite TestExampleSuite) TestCollection_Find() {
-// 	ExampleCollection_Find()
-// }
-// func ExampleCollection_Find() {
-// 	/* In a formal environment ignore defer code */ var err error
-// 	defer func() {
-// 		if err != nil {
-// 			xerr.PrintStack(err)
-// 		}
-// 	}()
-// 	ctx := context.Background()
-// 	// FindByObjectID
-// 	{
-// 		ExampleComment := mo.ExampleComment{
-// 			UserID:     1,
-// 			NewsID:     primitive.NewObjectID(),
-// 			Message:    "test find",
-// 		}
-// 		_, err = commentColl.InsertOne(ctx, &ExampleComment, mo.InsertOneCommand{})
-// 		if err != nil {
-// 			return
-// 		}
-// 		findExampleComment := mo.ExampleComment{}
-// 		// ExampleComment.AliasObjectID = primitive.NewObjectID() // if unExampleComment this line of code, hasExampleComment will be false
-// 		hasExampleComment, err := commentColl.FindByObjectID(ctx, ExampleComment.ID.ObjectID, &findExampleComment, mo.FindOneCommand{}) ; if err != nil {
-// 			return
-// 		}
-// 		log.Print("ExampleCollection_Find FindByObjectID: ", findExampleComment, hasExampleComment)
-// 	}
-// 	// FindOne
-// 	{
-// 		exampleCommentList := mo.ManyExampleComment{
-// 			{UserID: 2, Message: "x", NewsID: primitive.NewObjectID()},
-// 			{UserID: 2, Message: "y", NewsID: primitive.NewObjectID()},
-// 		}
-// 		_, err = commentColl.InsertMany(ctx, &exampleCommentList, mo.InsertManyCommand{})
-// 		if err != nil {
-// 			return
-// 		}
-// 		ExampleComment := mo.ExampleComment{}
-// 		field := ExampleComment.Field()
-// 		has, err := commentColl.FindOne(ctx, bson.D{
-// 			{field.UserID, 2},
-// 		}, &ExampleComment, mo.FindOneCommand{})
-// 		if err != nil {
-// 			return
-// 		}
-// 		log.Print("ExampleCollection_Find FindOne: ", has, ExampleComment)
-// 	}
-// }
+func (suite TestExampleSuite) TestCollection_Find() {
+	ExampleCollection_Find()
+}
+func ExampleCollection_Find() {
+	/* In a formal environment ignore defer code */ var err error
+	defer func() {
+		if err != nil {
+			xerr.PrintStack(err)
+		}
+	}()
+	ctx := context.Background()
+	// FindByObjectID
+	{
+		ExampleComment := mo.ExampleComment{
+			UserID:     1,
+			NewsID:     primitive.NewObjectID(),
+			Message:    "test find",
+		}
+		_, err = commentColl.InsertOne(ctx, &ExampleComment, mo.InsertOneCommand{})
+		if err != nil {
+			return
+		}
+		findExampleComment := mo.ExampleComment{}
+		// ExampleComment.AliasObjectID = primitive.NewObjectID() // if unExampleComment this line of code, hasExampleComment will be false
+		hasExampleComment, err := commentColl.FindByObjectID(ctx, ExampleComment.ID, &findExampleComment, mo.FindOneCommand{}) ; if err != nil {
+			return
+		}
+		log.Print("ExampleCollection_Find FindByObjectID: ", findExampleComment, hasExampleComment)
+	}
+	// FindOne
+	{
+		exampleCommentList := mo.ManyExampleComment{
+			{UserID: 2, Message: "x", NewsID: primitive.NewObjectID()},
+			{UserID: 2, Message: "y", NewsID: primitive.NewObjectID()},
+		}
+		_, err = commentColl.InsertMany(ctx, &exampleCommentList, mo.InsertManyCommand{})
+		if err != nil {
+			return
+		}
+		ExampleComment := mo.ExampleComment{}
+		field := ExampleComment.Field()
+		has, err := commentColl.FindOne(ctx, bson.D{
+			{field.UserID, 2},
+		}, &ExampleComment, mo.FindOneCommand{})
+		if err != nil {
+			return
+		}
+		log.Print("ExampleCollection_Find FindOne: ", has, ExampleComment)
+	}
+}
 
 func (suite TestExampleSuite) TestAggregateMapStringUint64() {
 	ExampleAggregateMapStringUint64()

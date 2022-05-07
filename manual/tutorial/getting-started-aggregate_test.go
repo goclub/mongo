@@ -42,15 +42,12 @@ func TestAggregate(t *testing.T) {
 			"genreCount": -1,
 		},
 	})
-	cursor, err := moviesColl.Aggregate(ctx, pipeline, mo.AggregateCommand{}) ; if err != nil {
-		return
-	}
 	type Item struct {
 		Name string `bson:"_id"`
 		GenreCount int64 `bson:"genreCount"`
 	}
 	list := []Item{}
-	err = cursor.All(ctx, &list) ; if err != nil {
+	err = moviesColl.Aggregate(ctx, pipeline, mo.AggregateCommand{}, &list) ; if err != nil {
 		return
 	}
 	log.Print("len(list)", len(list))

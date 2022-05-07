@@ -186,19 +186,19 @@ func ExampleUpdateCommand_Options_Upsert_InsertIgnore() {
 					xerr.PrintStack(err)
 				}
 			}()
-			result, err := newsStatDailyColl.UpdateOne(ctx, bson.D{
+			result, err := newsStatDailyColl.UpdateOne(ctx, mo.Filter{bson.D{
 				{field.Date, "2008-08-08"},
 				{field.NewsID, newsID},
-			}, bson.D{
+			}}, mo.Update{bson.D{
 				{
 					// You can also change it to $set
 					// Upsert is the key
 					"$inc", bson.D{
-						{field.UV, 1},
-						{field.PV, 1},
-					},
+					{field.UV, 1},
+					{field.PV, 1},
 				},
-			}, mo.UpdateCommand{
+				},
+			}}, mo.UpdateCommand{
 				// If true, a new document will be inserted if the filter does not match any documents in the collection. The
 				// default value is false.
 				Upsert: xtype.Bool(true),
@@ -252,15 +252,15 @@ func ExampleCollection_Find() {
 		if err != nil {
 			return
 		}
-		ExampleComment := mo.ExampleComment{}
-		field := ExampleComment.Field()
-		has, err := commentColl.FindOne(ctx, bson.D{
+		exampleComment := mo.ExampleComment{}
+		field := exampleComment.Field()
+		has, err := commentColl.FindOne(ctx, mo.Filter{bson.D{
 			{field.UserID, 2},
-		}, &ExampleComment, mo.FindOneCommand{})
+		}}, &exampleComment, mo.FindOneCommand{})
 		if err != nil {
 			return
 		}
-		log.Print("ExampleCollection_Find FindOne: ", has, ExampleComment)
+		log.Print("ExampleCollection_Find FindOne: ", has, exampleComment)
 	}
 }
 
@@ -398,7 +398,7 @@ func ExamplePointGeoJSON() {
 			},
 		},
 	}
-	err = locationCool.Find(ctx, filter, mo.FindCommand{Limit: xtype.Uint64(100)}, &targetList) ; if err != nil {
+	err = locationCool.Find(ctx, mo.Filter{filter}, mo.FindCommand{Limit: xtype.Uint64(100)}, &targetList) ; if err != nil {
 		return
 	}
 	log.Print("len(targetList)", len(targetList))
@@ -449,9 +449,9 @@ func ExamplePaging() {
 	}
 	var pagingList mo.ManyExampleComment
 	total, err := commentColl.Paging(ctx, mo.Paging{
-		Filter:    bson.M{
+		Filter:    mo.Filter{bson.M{
 			field.Message: "paging",
-		},
+		}},
 		FindCmd:   mo.FindCommand{},
 		ResultPtr: &pagingList,
 		CountCmd:  mo.CountCommand{},

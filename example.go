@@ -58,7 +58,7 @@ func (many ManyExampleMovie) AfterInsertMany(data AfterInsertManyData) (err erro
 }
 
 type ExampleComment struct {
-	ID         primitive.ObjectID    `bson:"_id,omitempty"`
+	ID         primitive.ObjectID `bson:"_id,omitempty"`
 	UserID     uint64             `bson:"userID"`
 	NewsID     primitive.ObjectID `bson:"newsID"`
 	Message    string             `bson:"message"`

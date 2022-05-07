@@ -43,7 +43,7 @@ func (c *Collection) InsertOne(ctx context.Context, document Document, cmd Inser
 			err = xerr.WithStack(err)
 		}
 	}()
-	err = document.BeforeUpdate() ; if err != nil {
+	err = document.BeforeInsert() ; if err != nil {
 	    return
 	}
 	coreRes, err := c.Core.InsertOne(ctx, document, cmd.Options()...)
@@ -100,35 +100,9 @@ func (c *Collection) InsertMany(ctx context.Context, documents ManyDocument, cmd
 }
 
 func (c *Collection) FindByObjectID(ctx context.Context, objectID primitive.ObjectID, document Document, cmd FindOneCommand) (has bool, err error) {
-	defer func() {
-		if err != nil {
-			err = xerr.WithStack(err)
-		}
-	}()
-	res := c.Core.FindOne(ctx, bson.D{{"_id", objectID}}, cmd.Options()...)
-	err = res.Err()
-	has = true
-	if xerr.Is(err, mongo.ErrNoDocuments) {
-		has = false
-		err = nil
-		return
-	}
-	if xerr.Is(err, mongo.ErrNilDocument) {
-		has = false
-		err = nil
-		return
-	}
-	if err != nil {
-		return
-	}
-	err = res.Decode(document)
-	if err != nil {
-		return
-	}
-	return
+	return c.FindOne(ctx, Filter{bson.D{{"_id", objectID}}},document, cmd)
 }
-
-func (c *Collection) FindOne(ctx context.Context, filter interface{}, document Document, cmd FindOneCommand) (has bool, err error) {
+func (c *Collection) FindOne(ctx context.Context, filter Filter, document Document, cmd FindOneCommand) (has bool, err error) {
 	defer func() {
 		if err != nil {
 			err = xerr.WithStack(err)
@@ -156,32 +130,41 @@ func (c *Collection) FindOne(ctx context.Context, filter interface{}, document D
 	}
 	return
 }
-func (c *Collection) Find(ctx context.Context, filter interface{}, cmd FindCommand, resultPtr interface{}) (err error) {
+func (c *Collection) FindCursor(ctx context.Context, filter Filter, cmd FindCommand) (cursor *mongo.Cursor, err error) {
+	defer func() {
+		if err != nil {
+			err = xerr.WithStack(err)
+		}
+	}()
+	cursor, err = c.Core.Find(ctx, filter.BSON, cmd.Options()...) ; if err != nil {
+		return
+	}
+	return
+}
+func (c *Collection) Find(ctx context.Context, filter Filter, cmd FindCommand, resultPtr interface{}) (err error) {
 	cursor, err := c.FindCursor(ctx, filter, cmd) ; if err != nil {
 		return
 	}
 	return cursor.All(ctx, resultPtr)
 }
-func (c *Collection) FindCursor(ctx context.Context, filter interface{}, cmd FindCommand) (cursor *mongo.Cursor, err error) {
+func (c *Collection) UpdateOne(ctx context.Context, filter Filter, update Update, cmd UpdateCommand) (updateResult *mongo.UpdateResult, err error) {
 	defer func() {
 		if err != nil {
 			err = xerr.WithStack(err)
 		}
 	}()
-	cursor, err = c.Core.Find(ctx, filter, cmd.Options()...) ; if err != nil {
-		return
+	return c.Core.UpdateOne(ctx, filter.BSON, update.BSON, cmd.Options()...)
+}
+func (c *Collection) Aggregate(ctx context.Context, pipeline interface{}, cmd AggregateCommand, resultPtr interface{}) (err error) {
+	cursor, err := c.AggregateCursor(ctx, pipeline, cmd) ; if err != nil {
+	    return
+	}
+	err = cursor.All(ctx, resultPtr) ; if err != nil {
+	    return
 	}
 	return
 }
-func (c *Collection) UpdateOne(ctx context.Context, filter interface{}, update interface{}, cmd UpdateCommand) (updateResult *mongo.UpdateResult, err error) {
-	defer func() {
-		if err != nil {
-			err = xerr.WithStack(err)
-		}
-	}()
-	return c.Core.UpdateOne(ctx, filter, update, cmd.Options()...)
-}
-func (c *Collection) Aggregate(ctx context.Context, pipeline interface{}, cmd AggregateCommand) (cursor *mongo.Cursor, err error) {
+func (c *Collection) AggregateCursor(ctx context.Context, pipeline interface{}, cmd AggregateCommand) (cursor *mongo.Cursor, err error) {
 	defer func() {
 		if err != nil {
 			err = xerr.WithStack(err)
@@ -189,14 +172,14 @@ func (c *Collection) Aggregate(ctx context.Context, pipeline interface{}, cmd Ag
 	}()
 	return c.Core.Aggregate(ctx, pipeline, cmd.Options()...)
 }
-func (c *Collection) DeleteOne(ctx context.Context, filter interface{}, cmd DeleteCommand) (result *mongo.DeleteResult, err error) {
-	return c.Core.DeleteOne(ctx, filter, cmd.Options()...)
+func (c *Collection) DeleteOne(ctx context.Context, filter Filter, cmd DeleteCommand) (result *mongo.DeleteResult, err error) {
+	return c.Core.DeleteOne(ctx, filter.BSON, cmd.Options()...)
 }
-func (c *Collection) DeleteMany(ctx context.Context, filter interface{}, cmd DeleteCommand) (result *mongo.DeleteResult, err error) {
-	return c.Core.DeleteMany(ctx, filter, cmd.Options()...)
+func (c *Collection) DeleteMany(ctx context.Context, filter Filter, cmd DeleteCommand) (result *mongo.DeleteResult, err error) {
+	return c.Core.DeleteMany(ctx, filter.BSON, cmd.Options()...)
 }
-func (c *Collection) Count(ctx context.Context, filter interface{}, cmd CountCommand) (total uint64, err error) {
-	countResult, err := c.Core.CountDocuments(ctx, filter, cmd.Options()...) ; if err != nil {
+func (c *Collection) Count(ctx context.Context, filter Filter, cmd CountCommand) (total uint64, err error) {
+	countResult, err := c.Core.CountDocuments(ctx, filter.BSON, cmd.Options()...) ; if err != nil {
 	    return
 	}
 	total = uint64(countResult)
@@ -204,7 +187,7 @@ func (c *Collection) Count(ctx context.Context, filter interface{}, cmd CountCom
 }
 
 type Paging struct {
-	Filter interface{}
+	Filter Filter
 	FindCmd FindCommand
 	ResultPtr interface{}
 	CountCmd CountCommand

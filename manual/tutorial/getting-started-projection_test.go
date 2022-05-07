@@ -35,7 +35,7 @@ func TestProjection(t *testing.T) {
 			Year int `bson:"year"`
 		}
 		list := []partMovies{}
-		err = moviesColl.Find(ctx, filter, mo.FindCommand{
+		err = moviesColl.Find(ctx, mo.Filter{filter}, mo.FindCommand{
 			Projection: bson.M{
 				"title": 1,
 				"directors": 1,
@@ -57,7 +57,7 @@ func TestProjection(t *testing.T) {
 			Genres []string `bson:"genres"`
 		}
 		list := []partMovies{}
-		err = moviesColl.Find(ctx, filter, mo.FindCommand{
+		err = moviesColl.Find(ctx, mo.Filter{filter}, mo.FindCommand{
 			Projection: bson.M{
 				"_id": 0,
 				"title": 1,

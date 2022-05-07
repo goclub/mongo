@@ -8,6 +8,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"log"
+	"reflect"
 )
 type Collection struct {
 	db   *Database
@@ -154,6 +156,12 @@ func (c *Collection) UpdateOne(ctx context.Context, data FilterUpdate, cmd Updat
 	return c.Core.UpdateOne(ctx, data.Filter, data.Update, cmd.Options()...)
 }
 func (c *Collection) Aggregate(ctx context.Context, pipeline interface{}, cmd AggregateCommand, resultPtr interface{}) (err error) {
+	rValue := reflect.ValueOf(resultPtr)
+	rType := rValue.Type()
+	if rType.Kind() != reflect.Ptr {
+		return xerr.New("goclub/mongo: mo.Collection{}.Aggregate(ctx, pipeline, cmd, ptr) " + rType.String() + " must be ptr")
+	}
+
 	cursor, err := c.AggregateCursor(ctx, pipeline, cmd) ; if err != nil {
 	    return
 	}

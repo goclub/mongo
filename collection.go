@@ -140,11 +140,11 @@ func (c *Collection) FindCursor(ctx context.Context, filter interface{}, cmd Fin
 	}
 	return
 }
-func (c *Collection) Find(ctx context.Context, filter interface{}, cmd FindCommand, resultPtr interface{}) (err error) {
+func (c *Collection) Find(ctx context.Context, filter interface{}, slicePtr interface{}, cmd FindCommand) (err error) {
 	cursor, err := c.FindCursor(ctx, filter, cmd) ; if err != nil {
 		return
 	}
-	return cursor.All(ctx, resultPtr)
+	return cursor.All(ctx, slicePtr)
 }
 func (c *Collection) UpdateOne(ctx context.Context, data FilterUpdate, cmd UpdateCommand) (updateResult *mongo.UpdateResult, err error) {
 	defer func() {
@@ -193,8 +193,8 @@ func (c *Collection) Count(ctx context.Context, filter interface{}, cmd CountCom
 
 type Paging struct {
 	Filter interface{}
-	FindCmd FindCommand
-	ResultPtr interface{}
+	FindCmd  FindCommand
+	SlicePtr interface{}
 	CountCmd CountCommand
 	Page uint64
 	PerPage uint64
@@ -208,7 +208,7 @@ func (c *Collection) Paging(ctx context.Context, p Paging) (total uint64, err er
 	}
 	p.FindCmd.Limit = xtype.Uint64(p.PerPage)
 	p.FindCmd.Skip = xtype.Uint64((p.Page-1)*p.PerPage)
-	err = c.Find(ctx, p.Filter, p.FindCmd, p.ResultPtr) ; if err != nil {
+	err = c.Find(ctx, p.Filter, p.SlicePtr, p.FindCmd); if err != nil {
 		return
 	}
 	countResult, err := c.Count(ctx, p.Filter, p.CountCmd) ; if err != nil {

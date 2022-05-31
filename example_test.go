@@ -399,7 +399,7 @@ func ExamplePointGeoJSON() {
 			},
 		},
 	}
-	err = locationCool.Find(ctx, filter, mo.FindCommand{Limit: xtype.Uint64(100)}, &targetList) ; if err != nil {
+	err = locationCool.Find(ctx, filter, &targetList, mo.FindCommand{Limit: xtype.Uint64(100)}); if err != nil {
 		return
 	}
 	log.Print("len(targetList)", len(targetList))
@@ -452,11 +452,11 @@ func ExamplePaging() {
 		Filter:    bson.M{
 			field.Message: "paging",
 		},
-		FindCmd:   mo.FindCommand{},
-		ResultPtr: &pagingList,
-		CountCmd:  mo.CountCommand{},
-		Page:      1,
-		PerPage:   10,
+		FindCmd:  mo.FindCommand{},
+		SlicePtr: &pagingList,
+		CountCmd: mo.CountCommand{},
+		Page:     1,
+		PerPage:  10,
 	}) ; if err != nil {
 		return
 	}

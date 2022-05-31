@@ -33,7 +33,7 @@ func TestFilterData(t *testing.T) {
 			},
 		}
 		list := mo.ManyExampleMovie{}
-		err = moviesColl.Find(ctx, mo.Filter{filter}, mo.FindCommand{}, &list) ; if err != nil {
+		err = moviesColl.Find(ctx, filter, &list, mo.FindCommand{}); if err != nil {
 			return
 		}
 		log.Print("len($lt)", len(list))
@@ -50,7 +50,7 @@ func TestFilterData(t *testing.T) {
 			},
 		}
 		list := mo.ManyExampleMovie{}
-		err = moviesColl.Find(ctx, mo.Filter{filter}, mo.FindCommand{}, &list) ; if err != nil {
+		err = moviesColl.Find(ctx, filter, &list, mo.FindCommand{}); if err != nil {
 			return
 		}
 		log.Print("len($gt)", len(list))
@@ -67,7 +67,7 @@ func TestFilterData(t *testing.T) {
 			},
 		}
 		list := mo.ManyExampleMovie{}
-		err = moviesColl.Find(ctx, mo.Filter{filter}, mo.FindCommand{}, &list) ; if err != nil {
+		err = moviesColl.Find(ctx, filter, &list, mo.FindCommand{}); if err != nil {
 		return
 	}
 		log.Print("len($in)", len(list))

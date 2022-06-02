@@ -2,6 +2,7 @@ package mo
 
 import (
 	"context"
+	"encoding/json"
 	xerr "github.com/goclub/error"
 	xtype "github.com/goclub/type"
 	"go.mongodb.org/mongo-driver/bson"
@@ -135,7 +136,33 @@ func (c *Collection) FindCursor(ctx context.Context, filter interface{}, cmd Fin
 			err = xerr.WithStack(err)
 		}
 	}()
+	if cmd.DebugLookupFilter {
+		filterBytes, jsonMarshalErr := json.MarshalIndent(filter, "", "  ") ; if jsonMarshalErr != nil {
+			Logger.Printf("goclub/mongo:debug:\n%+v", jsonMarshalErr)
+		} else {
+			Logger.Print("goclub/mongo:debug lookup filter:\n", string(filterBytes))
+		}
+	}
 	cursor, err = c.Core.Find(ctx, filter, cmd.Options()...) ; if err != nil {
+		return
+	}
+	if cmd.DebugLookupResults {
+		debugResults := []map[string]interface{}{}
+		defer cursor.Close(ctx)
+		for cursor.Next(ctx) {
+			debugItem := map[string]interface{}{}
+			debugErr := cursor.Decode(&debugItem) ; if debugErr  != nil {
+				Logger.Printf("goclub/mongo:debug:\n%+v", debugErr)
+			}
+			debugResults = append(debugResults, debugItem)
+		}
+		debugResultsBytes, jsonMarshalErr := json.Marshal(debugResults) ; if jsonMarshalErr != nil {
+			Logger.Printf("goclub/mongo:debug:\n%+v", jsonMarshalErr)
+		} else {
+			Logger.Printf("goclub/mongo:debug:decode lookup results:\nlen:%d\nresults:\n%s", len(debugResults), string(debugResultsBytes))
+		}
+		// 如果将开启了 DebugLookupResults 的代码提交到线上,线上会以为 cursor.Next() 已经读完数据导致结果为空
+		err = xerr.New("goclub/mongo:debug:decode lookup results")
 		return
 	}
 	return

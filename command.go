@@ -133,6 +133,8 @@ func (c FindOneCommand) Options() (opt []*options.FindOneOptions) {
 }
 
 type FindCommand struct {
+	DebugLookupFilter bool
+	DebugLookupResults bool
 	// If true, the server can write temporary data to disk while executing the find operation. This option is only
 	// valid for MongoDB versions >= 4.4. Server versions >= 3.2 will report an error if this option is specified. For
 	// server versions < 3.2, the driver will return a client-side error if this option is specified. The default value

@@ -27,7 +27,10 @@ func TestFind(t *testing.T) {
 	// 正文开始
 	filter := bson.M{}
 	list := mo.ManyExampleMovie{}
-	err = moviesColl.Find(ctx, filter, &list, mo.FindCommand{}); if err != nil {
+	err = moviesColl.Find(ctx, filter, &list, mo.FindCommand{
+		// DebugLookupFilter: true,
+		// DebugLookupResults: true,
+	}); if err != nil {
 	    return
 	}
 	log.Print("len(list)", len(list))

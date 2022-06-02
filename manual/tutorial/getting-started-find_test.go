@@ -25,10 +25,12 @@ func TestFind(t *testing.T) {
 	db := mo.NewDatabase(client, "goclub")
 	moviesColl := mo.NewCollection(db, "movies")
 	// 正文开始
-	filter := bson.M{}
+	filter := bson.M{
+
+	}
 	list := mo.ManyExampleMovie{}
 	err = moviesColl.Find(ctx, filter, &list, mo.FindCommand{
-		// DebugLookupFilter: true,
+		// DebugLookupQuery: true,
 		// DebugLookupResults: true,
 	}); if err != nil {
 	    return

@@ -136,12 +136,16 @@ func (c *Collection) FindCursor(ctx context.Context, filter interface{}, cmd Fin
 			err = xerr.WithStack(err)
 		}
 	}()
-	if cmd.DebugLookupFilter {
-		filterBytes, jsonMarshalErr := json.MarshalIndent(filter, "", "  ") ; if jsonMarshalErr != nil {
-			Logger.Printf("goclub/mongo:debug:\n%+v", jsonMarshalErr)
+	if cmd.DebugLookupQuery {
+		bsonBytes, marshalErr := bson.Marshal(filter) ; if err  != nil {
+			Logger.Printf("goclub/mongo:debug:\n%+v", marshalErr)
 		} else {
-			Logger.Print("goclub/mongo:debug lookup filter:\n", string(filterBytes))
+			printBytes := bson.Raw(bsonBytes).String()
+			// \"\$oid\":\"(.*?)\"
+			// ObjectId('$1')
+			Logger.Print("goclub/mongo:debug lookup query:\n", string(printBytes))
 		}
+
 	}
 	cursor, err = c.Core.Find(ctx, filter, cmd.Options()...) ; if err != nil {
 		return

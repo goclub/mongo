@@ -151,6 +151,6 @@ func (cmd lookupQueryCmd) checkAndRunLookupQuery(query interface{}) {
 	} else {
 		message = append(message, "limit:", strconv.FormatUint(cmd.Limit.Unwrap(), 10))
 	}
-	message = append(message, "nil options:", strings.Join(nilMessage, " "))
+	message = append(message, "nil options: " +  strings.Join(nilMessage, " "))
 	Logger.Print(strings.Join(message, "\n"))
 }

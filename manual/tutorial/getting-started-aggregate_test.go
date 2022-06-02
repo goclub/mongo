@@ -47,7 +47,10 @@ func TestAggregate(t *testing.T) {
 		GenreCount int64 `bson:"genreCount"`
 	}
 	list := []Item{}
-	err = moviesColl.Aggregate(ctx, pipeline, mo.AggregateCommand{}, &list) ; if err != nil {
+	err = moviesColl.Aggregate(ctx, pipeline, mo.AggregateCommand{
+		LookupQuery: true,
+		// LookupResult: true,
+	}, &list) ; if err != nil {
 		return
 	}
 	log.Print("len(list)", len(list))

@@ -257,8 +257,10 @@ func ExampleCollection_Find() {
 		field := exampleComment.Field()
 		has, err := commentColl.FindOne(ctx, bson.D{
 			{field.UserID, 2},
-		}, &exampleComment, mo.FindOneCommand{})
-		if err != nil {
+		}, &exampleComment, mo.FindOneCommand{
+			LookupQuery:  true,
+			LookupResult: true,
+		}) ; if err != nil {
 			return
 		}
 		log.Print("ExampleCollection_Find FindOne: ", has, exampleComment)

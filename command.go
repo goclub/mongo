@@ -42,6 +42,8 @@ func (c InsertManyCommand) Options() (opt []*options.InsertManyOptions) {
 }
 
 type FindOneCommand struct {
+	LookupQuery  bool
+	LookupResult bool
 	// If true, an operation on a sharded cluster can return partial results if some shards are down rather than
 	// returning an error. The default value is false.
 	AllowPartialResults xtype.OptionBool
@@ -89,7 +91,7 @@ type FindOneCommand struct {
 
 	// A document specifying the sort order to apply to the query. The first document in the sorted order will be
 	// returned. The driver will return an error if the sort parameter is a multi-key map.
-	Skip xtype.OptionInt64
+	Skip xtype.OptionUint64
 }
 
 func (c FindOneCommand) Options() (opt []*options.FindOneOptions) {
@@ -97,7 +99,7 @@ func (c FindOneCommand) Options() (opt []*options.FindOneOptions) {
 		opt = append(opt, options.FindOne().SetSort(c.Sort))
 	}
 	if c.Skip.Valid() {
-		options.FindOne().SetSkip(c.Skip.Unwrap())
+		options.FindOne().SetSkip(int64(c.Skip.Unwrap()))
 	}
 	if c.AllowPartialResults.Valid() {
 		opt = append(opt, options.FindOne().SetAllowPartialResults(c.AllowPartialResults.Unwrap()))
@@ -133,8 +135,8 @@ func (c FindOneCommand) Options() (opt []*options.FindOneOptions) {
 }
 
 type FindCommand struct {
-	DebugLookupQuery   bool
-	DebugLookupResults bool
+	LookupQuery  bool
+	LookupResult bool
 	// If true, the server can write temporary data to disk while executing the find operation. This option is only
 	// valid for MongoDB versions >= 4.4. Server versions >= 3.2 will report an error if this option is specified. For
 	// server versions < 3.2, the driver will return a client-side error if this option is specified. The default value
@@ -223,7 +225,6 @@ type FindCommand struct {
 	// sort parameter is a multi-key map.
 	Sort interface{}
 }
-
 func (c FindCommand) Options() (opt []*options.FindOptions) {
 	if c.AllowDiskUse.Valid() {
 		opt = append(opt, options.Find().SetAllowDiskUse(c.AllowDiskUse.Unwrap()))
@@ -334,6 +335,8 @@ func (c UpdateCommand) Options() (opt []*options.UpdateOptions) {
 }
 
 type AggregateCommand struct {
+	LookupQuery bool
+	LookupResult bool
 	// If true, the operation can write to temporary files in the _tmp subdirectory of the database directory path on
 	// the server. The default value is false.
 	AllowDiskUse xtype.OptionBool

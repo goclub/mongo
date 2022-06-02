@@ -36,6 +36,7 @@ func TestProjection(t *testing.T) {
 		}
 		list := []partMovies{}
 		err = moviesColl.Find(ctx, filter, &list, mo.FindCommand{
+			LookupQuery: true,
 			Projection: bson.M{
 				"title":     1,
 				"directors": 1,
@@ -58,6 +59,7 @@ func TestProjection(t *testing.T) {
 		}
 		list := []partMovies{}
 		err = moviesColl.Find(ctx, filter, &list, mo.FindCommand{
+			LookupQuery: true,
 			Projection: bson.M{
 				"_id":    0,
 				"title":  1,

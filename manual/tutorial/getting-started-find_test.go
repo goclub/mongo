@@ -30,16 +30,15 @@ func TestFind(t *testing.T) {
 	}
 	list := mo.ManyExampleMovie{}
 	err = moviesColl.Find(ctx, filter, &list, mo.FindCommand{
-		// DebugLookupQuery: true,
-		// DebugLookupResults: true,
+		LookupQuery: true,
+		// LookupResult: true,
 	}); if err != nil {
 	    return
 	}
-	log.Print("len(list)", len(list))
-	jsonb, err := json.MarshalIndent(list, "", "  ") ; if err != nil {
+	log.Print("len(list):", len(list))
+	jsonb, err := json.Marshal(list) ; if err != nil {
 	    return
 	}
 	log.Print("list:", string(jsonb))
-
 }
 
